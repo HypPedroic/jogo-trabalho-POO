@@ -3,7 +3,7 @@ import pygame
 import sys
 
 # Importando as classes necessárias
-from entidades.fisica_entidade import FisicaEntidade
+from entidades.entidade import Entidade
 from tilemap.tile_map import TileMap
 from background.background import Background
 
@@ -13,12 +13,12 @@ from utils.utils import load_image, load_images
 # Classe do jogo
 class Jogo:
 
-    # Inicializando o jogo
+    # Inicializando o jogo  
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((832, 640))
+        self.display = pygame.Surface((624, 480))
         pygame.display.set_caption("Jogo")
-        self.display = pygame.Surface((416, 320))
         self.clock = pygame.time.Clock()
         self.running = True
         
@@ -28,27 +28,41 @@ class Jogo:
         self.assets = {
             'grass': load_images('tiles/grama'),
             'player': load_image('player/player.png'),
-            'background': load_image('background/Background.png')
+            'background': load_image('background/Background.png'),
+            'Stones': load_images('Objetos/Stones'),
+            'Trees': load_images('Objetos/Trees'),
+            'Grama': load_images('Objetos/Grass'),
+            'Boxes': load_images('Objetos/Boxes'),
+            'Bushes': load_images('Objetos/Bushes'),
+            'Fences': load_images('Objetos/Fence'),
+            'Pointers': load_images('Objetos/Pointers'),
+            'Ridges': load_images('Objetos/Ridges'),
+            'Willows': load_images('Objetos/Willows'),
         }
 
-        self.player = FisicaEntidade(self, 'player', (0, 0), (32, 32))
+        self.player = Entidade(self, 'player', (0, 0), (32, 32))
         self.tilemap = TileMap(self, 32)
+        try:
+            self.tilemap.load('data/mapas/map.json')
+        except FileNotFoundError:
+            pass
+
+
         self.camera = [0, 0]
 
         # Inicializando o background
         self.background = Background(self)
         # Adicione suas camadas aqui - exemplo:
-        #self.background.add_layer('background/Layers/1.png', 0.1)
-        #self.background.add_layer('background/Layers/2.png', 0.3)
-        #self.background.add_layer('background/Layers/3.png', 0.5)
-        #self.background.add_layer('background/Layers/4.png', 0.7)
+        self.background.add_layer('background/Layers/1.png', 0.1)
+        self.background.add_layer('background/Layers/2.png', 0.3)
+        self.background.add_layer('background/Layers/3.png', 0.5)
+        self.background.add_layer('background/Layers/4.png', 0.7)
         self.background.add_layer('background/Layers/5.png', 0.9)
 
     def run(self):
         while self.running:
 
-            #self.display.fill((52, 222, 235))
-            self.display.blit(self.assets['background'], (0, 0))
+            self.display.fill((52, 222, 235))
 
             self.camera[0] += (self.player.retangulo().centerx - self.display.get_width() / 2 - self.camera[0]) / 16
             self.camera[1] += (self.player.retangulo().centery - self.display.get_height() / 2 - self.camera[1]) / 16
@@ -56,8 +70,8 @@ class Jogo:
 
             
             # Atualiza e renderiza o background
-            #self.background.update(self.camera)
-            #self.background.render(self.display)
+            self.background.update(self.camera)
+            self.background.render(self.display)
 
             self.tilemap.renderizar(self.display, offset=camera_movement)
             

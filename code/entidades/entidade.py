@@ -4,7 +4,7 @@ import pygame
 
 
 # Classe da entidade física
-class FisicaEntidade:
+class Entidade:
     def __init__(self, game, e_tipo, pos, tamanho):
         self._game = game
         self._e_tipo = e_tipo

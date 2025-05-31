@@ -12,7 +12,21 @@ class Background:
         :param image_path: Caminho da imagem da camada
         :param scroll_speed: Velocidade de rolagem (1.0 = velocidade normal, 0.5 = metade da velocidade, etc)
         """
+        # Carrega a imagem original
         image = load_image(image_path)
+        
+        # Obtém as dimensões da tela
+        screen_width = self.game.screen.get_width()
+        screen_height = self.game.screen.get_height()
+        
+        # Redimensiona a imagem para corresponder à altura da tela e manter a proporção
+        aspect_ratio = image.get_width() / image.get_height()
+        new_height = screen_height
+        new_width = int(new_height * aspect_ratio)
+        
+        # Redimensiona a imagem
+        image = pygame.transform.scale(image, (new_width, new_height))
+        
         self.layers.append({
             'image': image,
             'scroll_speed': scroll_speed,
@@ -33,17 +47,14 @@ class Background:
         Renderiza todas as camadas do background
         """
         for layer in self.layers:
-            # Calcula quantas vezes precisamos repetir a imagem horizontalmente
+            # Obtém as dimensões
             image_width = layer['image'].get_width()
-            image_height = layer['image'].get_height()
             screen_width = surface.get_width()
-            screen_height = surface.get_height()
             
-            # Calcula as posições inicial e final para renderização
+            # Calcula a posição x inicial
             start_x = int(layer['position'][0] % image_width)
-            start_y = int(layer['position'][1] % image_height)
             
-            # Renderiza as imagens necessárias para cobrir a tela
-            for x in range(start_x - image_width, screen_width, image_width):
-                for y in range(start_y - image_height, screen_height, image_height):
-                    surface.blit(layer['image'], (x, y)) 
+            # Renderiza as imagens necessárias para cobrir a tela horizontalmente
+            for x in range(start_x - image_width, screen_width + image_width, image_width):
+                # Renderiza a imagem apenas uma vez na vertical
+                surface.blit(layer['image'], (x, layer['position'][1])) 

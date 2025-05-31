@@ -1,20 +1,20 @@
 # Importando as bibliotecas necessárias
 import pygame
+import json
+
 
 #OFFSET DOS VIZINHOS
 NEIGHBOR_OFFSET = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (1, 1), (0, 1), (-1, 1)]
 FISICA_ATIVADA = {'grass', 'stone'}
 
 class TileMap:
-    def __init__(self, game, tile_size=32):
+    def __init__(self, game, tile_size=16):
         self._game = game
         self._tile_size = tile_size
         self._tilemap = {}
         self._offgrid_tiles = []
 
-        for i in range(10):
-            self._tilemap[str(0+i) + ';9'] = {'type': 'grass', 'variant': 1, 'pos': (0 + i, 9)}
-            self._tilemap['10;' + str(0+i)] = {'type': 'grass', 'variant': 11, 'pos': (10, 0 + i)}
+       
 
     # Definindo os getters e setters
     @property
@@ -59,6 +59,18 @@ class TileMap:
                 tiles.append(self._tilemap[check_lock])
         return tiles
     
+    def save(self, path):
+        with open(path, 'w') as f:
+            json.dump({'tilemap': self.tilemap, 'tile_size': self.tile_size, 'offgrid': self.offgrid_tiles}, f)
+
+    def load(self, path):
+        with open(path, 'r') as f:
+            data = json.load(f)
+            self.tilemap = data['tilemap']
+            self.tile_size = data['tile_size']
+            self.offgrid_tiles = data['offgrid']
+
+
     # Método para pegar os retângulos ao redor de uma posição
     def fisica_rect_around(self, pos):
         rects = []
