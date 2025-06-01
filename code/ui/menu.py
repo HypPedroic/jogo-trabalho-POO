@@ -130,7 +130,7 @@ class Menu:
     def renderizar_menu_principal(self, surf):
         """Renderiza o menu principal"""
         # Renderiza o título
-        titulo = self.fonte_titulo.render("Super Mario Clone", True, self.cor_titulo)
+        titulo = self.fonte_titulo.render("RUN OR DIE", True, self.cor_titulo)
         surf.blit(titulo, (surf.get_width() // 2 - titulo.get_width() // 2, 100))
         
         # Renderiza as opções do menu
