@@ -2,6 +2,7 @@
 import os
 import pygame
 
+
 # Caminho base das imagens
 BASE_IMG_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data', 'images')
 
@@ -16,4 +17,6 @@ def load_images(path):
         img = load_image(path + '/' + img_name)
         images.append(img)
     return images
+
+
         
