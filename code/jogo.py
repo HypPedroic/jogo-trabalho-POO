@@ -27,7 +27,7 @@ class Jogo:
         self.clock = pygame.time.Clock()
         self.running = True
         self.menu = MenuPrincipal(self.screen)
-        self.estado = "menu"
+        self.estado = "jogando"
         self.movemento = [False, False]
         
         # Carregando as imagens
@@ -84,7 +84,6 @@ class Jogo:
 
         self.tilemap.renderizar(self.display, offset=camera_movement)
 
-        self.interface.draw(self.display)
             
         self.player.update(self.tilemap, (self.movemento[0] - self.movemento[1], 0))
         self.player.renderizar(self.display, offset=camera_movement)
@@ -100,7 +99,7 @@ class Jogo:
                 elif event.key == pygame.K_LEFT:
                     self.movemento[1] = True
                 if event.key == pygame.K_UP:
-                    self.player.velocidade[1] = -5
+                    self.player.pular()
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
                     self.movemento[0] = False

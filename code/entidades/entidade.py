@@ -115,7 +115,7 @@ class Entidade:
         #Calcula o movimento da entidade
         frame_movement = (movement[0] + self._velocidade[0], movement[1] + self._velocidade[1])
 
-        self._pos[0] += frame_movement[0] * 5
+        self._pos[0] += frame_movement[0] * 3
         # Verifica se a entidade está colidindo com algum retângulo de colisão para o eixo X
         retangulo_colisao = self.retangulo()
         for rect in self.game.tilemap.fisica_rect_around(self._pos):
