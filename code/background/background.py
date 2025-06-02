@@ -1,9 +1,9 @@
-import pygame
-from utils.utils import load_image
+from .backgroundlayer import BackgroundLayer
+import json
 
 class Background:
-    def __init__(self, game):
-        self.game = game
+    def __init__(self, screen_height):
+        self.screen_height = screen_height
         self.layers = []
         
     def add_layer(self, image_path, scroll_speed):
@@ -12,49 +12,42 @@ class Background:
         :param image_path: Caminho da imagem da camada
         :param scroll_speed: Velocidade de rolagem (1.0 = velocidade normal, 0.5 = metade da velocidade, etc)
         """
-        # Carrega a imagem original
-        image = load_image(image_path)
+        layer = BackgroundLayer(image_path, scroll_speed, self.screen_height)
+        self.layers.append(layer)
         
-        # Obtém as dimensões da tela
-        screen_width = self.game.screen.get_width()
-        screen_height = self.game.screen.get_height()
-        
-        # Redimensiona a imagem para corresponder à altura da tela e manter a proporção
-        aspect_ratio = image.get_width() / image.get_height()
-        new_height = screen_height
-        new_width = int(new_height * aspect_ratio)
-        
-        # Redimensiona a imagem
-        image = pygame.transform.scale(image, (new_width, new_height))
-        
-        self.layers.append({
-            'image': image,
-            'scroll_speed': scroll_speed,
-            'position': [0, 0]
-        })
-    
     def update(self, camera_pos):
-        """
-        Atualiza a posição das camadas baseado na posição da câmera
-        """
+        """Atualiza a posição de todas as camadas"""
         for layer in self.layers:
-            # Atualiza a posição da camada baseado na velocidade de scroll
-            layer['position'][0] = -camera_pos[0] * layer['scroll_speed']
-            layer['position'][1] = -camera_pos[1] * layer['scroll_speed']
+            layer.update(camera_pos)
     
     def render(self, surface):
-        """
-        Renderiza todas as camadas do background
-        """
+        """Renderiza todas as camadas do background"""
         for layer in self.layers:
-            # Obtém as dimensões
-            image_width = layer['image'].get_width()
-            screen_width = surface.get_width()
+            layer.render(surface)
             
-            # Calcula a posição x inicial
-            start_x = int(layer['position'][0] % image_width)
+    def save(self, filepath):
+        """Salva a configuração do background em um arquivo JSON"""
+        data = {
+            'screen_height': self.screen_height,
+            'layers': [layer.to_dict() for layer in self.layers]
+        }
+        with open(filepath, 'w') as f:
+            json.dump(data, f, indent=4)
             
-            # Renderiza as imagens necessárias para cobrir a tela horizontalmente
-            for x in range(start_x - image_width, screen_width + image_width, image_width):
-                # Renderiza a imagem apenas uma vez na vertical
-                surface.blit(layer['image'], (x, layer['position'][1])) 
+    @classmethod
+    def load(cls, filepath):
+        """Carrega um background a partir de um arquivo JSON"""
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+            
+        background = cls(data['screen_height'])
+        for layer_data in data['layers']:
+            background.add_layer(layer_data['image_path'], layer_data['scroll_speed'])
+            
+        return background
+    
+    def resize(self, new_height):
+        """Redimensiona todas as camadas para uma nova altura"""
+        self.screen_height = new_height
+        for layer in self.layers:
+            layer.resize(new_height) 

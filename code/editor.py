@@ -40,7 +40,7 @@ class Editor:
             #'stone': load_images('tiles/pedra'),  # Adicione mais tipos de tiles aqui
         }
 
-        self.tilemap = TileMap(self, 32)
+        self.tilemap = TileMap(32)
 
         try:
             self.tilemap.load('data/mapas/map.json')

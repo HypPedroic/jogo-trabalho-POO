@@ -4,16 +4,12 @@ import sys
 
 
 # Importando as classes necessárias
-from entidades.entidade import Entidade
 from entidades.player import Player
 from tilemap.tile_map import TileMap
 from background.background import Background
-from utils.animation import Animation
 from menu.menu_principal import MenuPrincipal
 
 
-# Importando as funções necessárias
-from utils.utils import load_image, load_images
 
 # Classe do jogo
 class Jogo:
@@ -26,46 +22,28 @@ class Jogo:
         pygame.display.set_caption("Jogo")
         self.clock = pygame.time.Clock()
         self.running = True
+        self.camera = [0, 0]
+        
         self.menu = MenuPrincipal(self.screen)
         self.estado = "jogando"
-        self.movemento = [False, False]
-        
-        # Carregando as imagens
-        self.assets = {
-            'grass': load_images('tiles/grama'),
-            'background': load_image('background/Background.png'),
-            'Stones': load_images('Objetos/Stones'),
-            'Trees': load_images('Objetos/Trees'),
-            'Grama': load_images('Objetos/Grass'),
-            'Boxes': load_images('Objetos/Boxes'),
-            'Bushes': load_images('Objetos/Bushes'),
-            'Fences': load_images('Objetos/Fence'),
-            'Pointers': load_images('Objetos/Pointers'),
-            'Ridges': load_images('Objetos/Ridges'),
-            'Willows': load_images('Objetos/Willows'),
-            'player/idle': Animation(load_images('player/idle'), img_dur = 12),
-            'player/run': Animation(load_images('player/run'), img_dur = 24),
-            'player/jump': Animation(load_images('player/jump'), img_dur = 16),
-        }
 
-        self.player = Player(self, (0, 0), (20, 32))
-        self.tilemap = TileMap(self, 32)
+        self.player = Player((0, 0), (20, 32))
+
+        self.tilemap = TileMap(32)
         try:
             self.tilemap.load('data/mapas/map.json')
         except FileNotFoundError:
             pass
 
 
-        self.camera = [0, 0]
-
         # Inicializando o background
-        self.background = Background(self)
-        # Adicione suas camadas aqui - exemplo:
-        self.background.add_layer('background/Layers/1.png', 0.1)
-        self.background.add_layer('background/Layers/2.png', 0.3)
-        self.background.add_layer('background/Layers/3.png', 0.5)
-        self.background.add_layer('background/Layers/4.png', 0.7)
-        self.background.add_layer('background/Layers/5.png', 0.9)
+        self.background = Background(self.screen.get_height())
+        
+        # Carregando um background existente ou criando um novo
+        try:
+            self.background = Background.load('data/backgrounds/default.json')
+        except FileNotFoundError:
+            pass
 
     def inicializar_jogo(self):
         self.estado = "jogando"
@@ -85,7 +63,7 @@ class Jogo:
         self.tilemap.renderizar(self.display, offset=camera_movement)
 
             
-        self.player.update(self.tilemap, (self.movemento[0] - self.movemento[1], 0))
+        self.player.update(self.tilemap)
         self.player.renderizar(self.display, offset=camera_movement)
 
         print(self.tilemap.fisica_rect_around(self.player.pos))
@@ -95,16 +73,16 @@ class Jogo:
                 self.running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
-                    self.movemento[0] = True
+                    self.player.mover_direita(True)
                 elif event.key == pygame.K_LEFT:
-                    self.movemento[1] = True
+                    self.player.mover_esquerda(True)
                 if event.key == pygame.K_UP:
                     self.player.pular()
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
-                    self.movemento[0] = False
+                    self.player.mover_direita(False)
                 elif event.key == pygame.K_LEFT:
-                    self.movemento[1] = False
+                    self.player.mover_esquerda(False)
 
         self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
         pygame.display.flip()

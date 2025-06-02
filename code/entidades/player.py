@@ -1,9 +1,20 @@
 import pygame
 from .entidade import Entidade
+from utils.utils import load_images
+from utils.animation import Animation
 
 class Player(Entidade):
-    def __init__(self, game, pos, tamanho):
-        super().__init__(game, 'player', pos, tamanho)
+    def __init__(self, pos, tamanho):
+        # Carregando os assets do player
+        self.assets = {
+            'idle': Animation(load_images('player/idle'), img_dur=12),
+            'run': Animation(load_images('player/run'), img_dur=24),
+            'jump': Animation(load_images('player/jump'), img_dur=16),
+        }
+        
+        # Chamando o construtor da classe pai
+        super().__init__(self.assets, pos, tamanho)
+        
         self._vida = 100
         self._furia = 0
         self._pulos_disponiveis = 2
@@ -53,8 +64,8 @@ class Player(Entidade):
     def iFrames(self, valor):
         self._iFrames = valor
     
-    def update(self, tilemap, movement=(0, 0)):
-        super().update(movement)
+    def update(self, tilemap):
+        super().update(tilemap)
 
         self.air_time += 1
         
@@ -75,11 +86,11 @@ class Player(Entidade):
                 self._tempo_queda += 1
                 # Se passou do tempo máximo e ainda tem pulos disponíveis
                 if self._tempo_queda >= self._tempo_max_queda and self.pulos_disponiveis > 1:
-                    self.pulos_disponiveis = 0
+                    self.pulos_disponiveis = 1
         
         if self.air_time > 4:
             self.set_action('jump')
-        elif movement[0] != 0:
+        elif self.movimento[0] or self.movimento[1]:  # Se está se movendo para qualquer direção
             self.set_action('run')
         else:
             self.set_action('idle')
