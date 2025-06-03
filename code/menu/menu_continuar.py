@@ -1,6 +1,6 @@
 import pygame
 import pickle
-from .botoes import Botao
+from botoes import Botao
 
 class MenuContinuar:
     def __init__(self, screen):

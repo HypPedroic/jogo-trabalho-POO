@@ -1,5 +1,5 @@
 import pygame
-from .botoes import Botao
+from botoes import Botao
 
 class MenuJogar:
     def __init__(self, screen):
