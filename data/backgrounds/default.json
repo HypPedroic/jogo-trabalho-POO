@@ -1,0 +1,25 @@
+{
+    "screen_height": 640,
+    "layers": [
+        {
+            "image_path": "background/Layers/1.png",
+            "scroll_speed": 0.1
+        },
+        {
+            "image_path": "background/Layers/2.png",
+            "scroll_speed": 0.3
+        },
+        {
+            "image_path": "background/Layers/3.png",
+            "scroll_speed": 0.5
+        },
+        {
+            "image_path": "background/Layers/4.png",
+            "scroll_speed": 0.7
+        },
+        {
+            "image_path": "background/Layers/5.png",
+            "scroll_speed": 0.9
+        }
+    ]
+}

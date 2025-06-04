@@ -11,7 +11,8 @@ class MenuJogar:
     def iniciar_jogo(self):
         # Substitua por: "from seu_jogo import Game" (se necessário)
         print("Jogo iniciado!")  # Só para teste
-
+        return True
+    
     def voltar(self):
         from .menu_principal import MenuPrincipal
         MenuPrincipal(self.screen).run()
