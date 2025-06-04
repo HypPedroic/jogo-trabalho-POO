@@ -1,6 +1,9 @@
 import pygame
 import os
 from .botoes import Botao
+from .menu_jogar import MenuJogar
+from .menu_continuar import MenuContinuar
+from .menu_config import MenuConfig
 
 class MenuPrincipal:
     def __init__(self, screen):
@@ -79,15 +82,12 @@ class MenuPrincipal:
             pygame.display.flip()
     
     def abrir_jogar(self):
-        from .menu_jogar import MenuJogar
         MenuJogar(self.screen).run()
     
     def abrir_continuar(self):
-        from .menu_continuar import MenuContinuar
         MenuContinuar(self.screen).run()
     
     def abrir_config(self):
-        from .menu_config import MenuConfig
         MenuConfig(self.screen).run()
     
     def sair(self):
