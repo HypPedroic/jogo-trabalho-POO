@@ -1,6 +1,6 @@
 import pygame
 import os
-from botoes import Botao
+from .botoes import Botao
 
 class MenuPrincipal:
     def __init__(self, screen):

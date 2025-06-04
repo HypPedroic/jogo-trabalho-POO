@@ -152,7 +152,7 @@ class Entidade:
 
         #Gera a gravidade, movimento de queda
         #Gera a velocidade de queda e defina um limite para ela
-        self.velocidade[1] = min(self.velocidade[1]+0.2, 5)
+        self.velocidade[1] = min(self.velocidade[1]+0.15, 4)  # Reduzido de 0.2 para 0.15 e limite de 5 para 4
         #Se a entidade está colidindo com o chão, a velocidade de queda é 0
         if self.colisoes['cima'] or self.colisoes['baixo']:
             self.velocidade[1] = 0

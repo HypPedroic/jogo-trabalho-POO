@@ -1,5 +1,5 @@
 import pygame
-from botoes import Botao
+from .botoes import Botao
 
 class MenuConfig:
     def __init__(self, screen):
