@@ -102,7 +102,7 @@ class Player(Entidade):
             self.air_time = 5
             self._caindo = False  # Reseta o estado de queda ao pular
         elif self.pulos_disponiveis == 1:
-            self.velocidade[1] = -4
+            self.velocidade[1] = -6
             self.pulos_disponiveis -= 1
             self.air_time = 5
             self._caindo = False  # Reseta o estado de queda ao pular

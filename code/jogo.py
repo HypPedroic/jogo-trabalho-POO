@@ -7,7 +7,7 @@ import sys
 from entidades.player import Player
 from tilemap.tile_map import TileMap
 from background.background import Background
-from menu.menu_principal import MenuPrincipal
+#from menu.menu_principal import MenuPrincipal
 
 
 
@@ -24,7 +24,7 @@ class Jogo:
         self.running = True
         self.camera = [0, 0]
         
-        self.menu = MenuPrincipal(self.screen)
+        #self.menu = MenuPrincipal(self.screen)
         self.estado = "jogando"
 
         self.player = Player((0, 0), (20, 32))
@@ -92,7 +92,8 @@ class Jogo:
         while self.running:
 
             if self.estado == "menu":
-                self.menu.run()
+                #self.menu.run()
+                pass
             elif self.estado == "jogando":
                 self.rodar_jogo()
 
