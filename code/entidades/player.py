@@ -10,19 +10,31 @@ class Player(Entidade):
             'idle': Animation(load_images('player/idle'), img_dur=12),
             'run': Animation(load_images('player/run'), img_dur=24),
             'jump': Animation(load_images('player/jump'), img_dur=16),
+            'idleFoice': Animation(load_images('player/idleFoice'), img_dur=12),
+            'runFoice': Animation(load_images('player/runFoice'), img_dur=24),
+            'jumpFoice': Animation(load_images('player/jumpFoice'), img_dur=16),
         }
         
         # Chamando o construtor da classe pai
         super().__init__(self.assets, pos, tamanho)
         
-        self._vida = 100
-        self._furia = 0
+        self._vidaMax = 3
+        self._vida = self._vidaMax
+        self._estado = 'normal'
         self._pulos_disponiveis = 2
         self._iFrames = False
         self._air_time = 0
         self._tempo_queda = 0  # Tempo desde que começou a cair
         self._tempo_max_queda = 15  # Tempo máximo antes de perder os pulos (ajuste conforme necessário)
         self._caindo = False  # Flag para identificar se está caindo sem ter pulado
+
+    @property
+    def vidaMax(self):
+        return self._vidaMax
+    
+    @vidaMax.setter
+    def vidaMax(self, valor):
+        self._vidaMax = valor
 
     @property
     def vida(self):
@@ -33,12 +45,12 @@ class Player(Entidade):
         self._vida = valor
 
     @property
-    def furia(self):
-        return self._furia
+    def estado(self):
+        return self._estado
     
-    @furia.setter
-    def furia(self, valor):
-        self._furia = valor
+    @estado.setter
+    def estado(self, valor):
+        self._estado = valor
 
     @property
     def pulos_disponiveis(self):
@@ -63,9 +75,35 @@ class Player(Entidade):
     @iFrames.setter
     def iFrames(self, valor):
         self._iFrames = valor
+
+    @property
+    def tempo_queda(self):
+        return self._tempo_queda
+    
+    @tempo_queda.setter
+    def tempo_queda(self, valor):
+        self._tempo_queda = valor
+
+    @property
+    def tempo_max_queda(self):
+        return self._tempo_max_queda
+    
+    @tempo_max_queda.setter
+    def tempo_max_queda(self, valor):
+        self._tempo_max_queda = valor
+
+    @property
+    def caindo(self):
+        return self._caindo
+    
+    @caindo.setter
+    def caindo(self, valor):
+        self._caindo = valor
     
     def update(self, tilemap):
         super().update(tilemap)
+
+
 
         self.air_time += 1
         
@@ -89,11 +127,20 @@ class Player(Entidade):
                     self.pulos_disponiveis = 1
         
         if self.air_time > 4:
-            self.set_action('jump')
+            if self.estado == 'normal':
+                self.set_action('jump')
+            elif self.estado == 'foice':
+                self.set_action('jumpFoice')
         elif self.movimento[0] or self.movimento[1]:  # Se está se movendo para qualquer direção
-            self.set_action('run')
+            if self.estado == 'normal':
+                self.set_action('run')
+            elif self.estado == 'foice':
+                self.set_action('runFoice')
         else:
-            self.set_action('idle')
+            if self.estado == 'normal':
+                self.set_action('idle')
+            elif self.estado == 'foice':
+                self.set_action('idleFoice')
 
     def pular(self):
         if self.pulos_disponiveis > 1:
@@ -106,4 +153,12 @@ class Player(Entidade):
             self.pulos_disponiveis -= 1
             self.air_time = 5
             self._caindo = False  # Reseta o estado de queda ao pular
+
+    def alterar_estado(self):
+        if self.estado == 'normal':
+            self.estado = 'foice'
+            self.anim_offeset = (-8, -16)
+        elif self.estado == 'foice':
+            self.estado = 'normal'
+            self.anim_offeset = (-8, 0)
 

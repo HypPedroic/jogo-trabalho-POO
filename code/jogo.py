@@ -78,6 +78,8 @@ class Jogo:
                     self.player.mover_esquerda(True)
                 if event.key == pygame.K_UP:
                     self.player.pular()
+                if event.key == pygame.K_q:
+                    self.player.alterar_estado()
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
                     self.player.mover_direita(False)
