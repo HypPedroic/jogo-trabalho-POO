@@ -50,11 +50,6 @@ class GameInterface:
                 base_path + "puloF.png"
             ).convert_alpha()
 
-            # Carrega a imagem da fúria
-            self.images["fury"] = pygame.image.load(
-                base_path + "furia.png"
-            ).convert_alpha()
-
             # Redimensiona as imagens se necessário
             self.images["heart"] = pygame.transform.scale(
                 self.images["heart"], (32, 32)
@@ -65,7 +60,6 @@ class GameInterface:
             self.images["jump_unavailable"] = pygame.transform.scale(
                 self.images["jump_unavailable"], (32, 32)
             )
-            self.images["fury"] = pygame.transform.scale(self.images["fury"], (32, 32))
 
         except (pygame.error, FileNotFoundError) as e:
             print(f"Erro ao carregar imagens da interface: {e}")
@@ -90,10 +84,7 @@ class GameInterface:
         pygame.draw.circle(jump_unavailable_surf, (100, 100, 100), (16, 16), 15)
         self.images["jump_unavailable"] = jump_unavailable_surf
 
-        # Fúria (laranja)
-        fury_surf = pygame.Surface((32, 32), pygame.SRCALPHA)
-        pygame.draw.rect(fury_surf, (255, 165, 0), (0, 0, 32, 32))
-        self.images["fury"] = fury_surf
+        # Não precisamos mais da imagem de fúria
 
     def render_hearts(self, surface):
         """Renderiza os corações de vida"""
@@ -131,13 +122,10 @@ class GameInterface:
 
     def render_fury_bar(self, surface):
         """Renderiza a barra de fúria"""
-        # Desenha o ícone da fúria
-        surface.blit(self.images["fury"], (self.fury_bar_x - 40, self.fury_bar_y))
-
         # Desenha o fundo da barra
         background_rect = pygame.Rect(
             self.fury_bar_x,
-            self.fury_bar_y + 6,
+            self.fury_bar_y,
             self.fury_bar_width,
             self.fury_bar_height,
         )
@@ -150,25 +138,20 @@ class GameInterface:
             if self.game.player._estado == "foice":
                 fury_level = 1.0  # Fúria máxima quando em estado foice
             else:
-                # Pode implementar uma lógica de acúmulo de fúria aqui
-                fury_level = 0.3  # Exemplo: 30% de fúria
+                fury_level = 0.0  # Sem fúria quando não está usando a foice
 
-        # Desenha a barra de fúria
+        # Desenha a barra de fúria - sempre vermelha quando ativa
         if fury_level > 0:
             fury_width = int(self.fury_bar_width * fury_level)
             fury_rect = pygame.Rect(
-                self.fury_bar_x, self.fury_bar_y + 6, fury_width, self.fury_bar_height
+                self.fury_bar_x, self.fury_bar_y, fury_width, self.fury_bar_height
             )
+            # Sempre vermelha quando usando a foice (Q)
+            pygame.draw.rect(surface, (255, 0, 0), fury_rect)
 
-            # Cor da barra baseada no nível
-            if fury_level >= 1.0:
-                color = (255, 0, 0)  # Vermelho quando cheia
-            elif fury_level >= 0.5:
-                color = (255, 165, 0)  # Laranja
-            else:
-                color = (255, 255, 0)  # Amarelo
-
-            pygame.draw.rect(surface, color, fury_rect)
+        # Adiciona texto "FÚRIA" ao lado da barra
+        fury_text = pygame.font.Font(None, 24).render("", True, (255, 255, 255))
+        surface.blit(fury_text, (self.fury_bar_x - 60, self.fury_bar_y - 2))
 
     def render_timer(self, surface):
         """Renderiza o contador de tempo"""

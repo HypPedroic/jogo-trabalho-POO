@@ -1,1 +1,46 @@
-[{"nome": "Jogador", "distancia": 561}, {"nome": "Jogador", "distancia": 279}, {"nome": "Jogador", "distancia": 267}, {"nome": "Jogador", "distancia": 232}, {"nome": "Jogador", "distancia": 224}, {"nome": "ZEZIN", "distancia": 157}, {"nome": "Jogador", "distancia": 142}, {"nome": "CACHORROLK", "distancia": 137}, {"nome": "gildair", "distancia": 110}, {"nome": "Jogador", "distancia": 109}]
+[
+  {
+    "nome": "sabri",
+    "tempo": 13,
+    "data": "04/06/2025 23:03"
+  },
+  {
+    "nome": "gill",
+    "tempo": 17,
+    "data": "04/06/2025 23:05"
+  },
+  {
+    "nome": "gilz",
+    "tempo": 32,
+    "data": "04/06/2025 22:58"
+  },
+  {
+    "nome": "BOLSONARO",
+    "tempo": 62,
+    "data": "04/06/2025 22:59"
+  },
+  {
+    "nome": "Jogador",
+    "distancia": 109
+  },
+  {
+    "nome": "gildair",
+    "distancia": 110
+  },
+  {
+    "nome": "CACHORROLK",
+    "distancia": 137
+  },
+  {
+    "nome": "Jogador",
+    "distancia": 142
+  },
+  {
+    "nome": "ZEZIN",
+    "distancia": 157
+  },
+  {
+    "nome": "Jogador",
+    "distancia": 224
+  }
+]
