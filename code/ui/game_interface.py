@@ -171,6 +171,19 @@ class GameInterface:
         timer_y = 20
 
         surface.blit(text_surface, (timer_x, timer_y))
+    
+    def render_enemy_counter(self, surface):
+        """Renderiza o contador de inimigos vivos"""
+        if hasattr(self.game, '_spawn_manager') and self.game._spawn_manager:
+            inimigos_vivos = self.game._spawn_manager.get_inimigos_vivos()
+            enemy_text = f"Inimigos: {inimigos_vivos}"
+            text_surface = pygame.font.Font(None, 28).render(enemy_text, True, (255, 255, 255))
+            
+            # Posiciona abaixo do timer
+            timer_x = surface.get_width() - text_surface.get_width() - 20
+            timer_y = 50
+            
+            surface.blit(text_surface, (timer_x, timer_y))
 
     def render(self, surface):
         """Renderiza todos os elementos da interface"""
@@ -178,6 +191,7 @@ class GameInterface:
         self.render_jump_orb(surface)
         self.render_fury_bar(surface)
         self.render_timer(surface)
+        self.render_enemy_counter(surface)
 
     def reset_timer(self):
         """Reseta o timer do jogo"""

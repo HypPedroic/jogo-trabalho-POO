@@ -26,6 +26,7 @@ class Player(Entidade):
         self._furia = 5
         self._pulos_disponiveis = 2
         self._iFrames = False
+        self._iframe_timer = 0
         self._air_time = 0
         self._atacando = 0
 
@@ -119,6 +120,13 @@ class Player(Entidade):
     
     def update(self, tilemap, game):
         super().update(tilemap)
+        
+        # Atualiza iframes
+        if self._iFrames and self._iframe_timer > 0:
+            self._iframe_timer -= 1
+            if self._iframe_timer <= 0:
+                self._iFrames = False
+                
         self.animacao_atual(game)
 
     def fisica_colisao_Y(self, tilemap):
@@ -167,6 +175,20 @@ class Player(Entidade):
 
     def ataque_furia(self):
         pass
+        
+    def receber_dano(self, dano=1):
+        """Player recebe dano de inimigos"""
+        if not self._iFrames:  # Só recebe dano se não estiver em iframes
+            self._vida -= dano
+            self._iFrames = True
+            # iFrames duram 60 frames (1 segundo a 60fps)
+            self._iframe_timer = 60
+            
+            if self._vida <= 0:
+                self._vida = 0
+                # Player morreu
+                return True
+        return False
 
     def animacao_atual(self, game):
         if self.atacando > 0:

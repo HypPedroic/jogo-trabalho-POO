@@ -1,5 +1,9 @@
 [
   {
+    "nome": "dd",
+    "tempo": 4
+  },
+  {
     "nome": "gg",
     "tempo": 9,
     "data": "05/06/2025 00:12"
@@ -8,6 +12,10 @@
     "nome": "fds",
     "tempo": 11,
     "data": "04/06/2025 23:58"
+  },
+  {
+    "nome": "dd",
+    "tempo": 12
   },
   {
     "nome": "sabri",
@@ -20,30 +28,20 @@
     "data": "04/06/2025 23:05"
   },
   {
+    "nome": "dd",
+    "tempo": 18
+  },
+  {
     "nome": "gilz",
     "tempo": 32,
     "data": "04/06/2025 22:58"
   },
   {
-    "nome": "gg",
-    "tempo": 47,
-    "data": "05/06/2025 00:11"
+    "nome": "JJ",
+    "tempo": 43
   },
   {
-    "nome": "BOLSONARO",
-    "tempo": 62,
-    "data": "04/06/2025 22:59"
-  },
-  {
-    "nome": "Jogador",
-    "distancia": 109
-  },
-  {
-    "nome": "gildair",
-    "distancia": 110
-  },
-  {
-    "nome": "CACHORROLK",
-    "distancia": 137
+    "nome": "ff",
+    "tempo": 46
   }
 ]

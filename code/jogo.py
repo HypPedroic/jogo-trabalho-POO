@@ -5,6 +5,7 @@ import sys
 
 # Importando as classes necessárias
 from entidades.player import Player
+from entidades.spawn_manager import SpawnManager
 from tilemap.tile_map import TileMap
 from background.background import Background
 from ui.game_interface import GameInterface
@@ -38,6 +39,7 @@ class Jogo:
         self._tilemap = None
         self._background = None
         self._game_interface = None
+        self._spawn_manager = None
 
         # Sistema de limbo
         self._limite_mapa_y = 1000  # Distância abaixo do mapa onde o player morre
@@ -141,6 +143,10 @@ class Jogo:
         # Inicializa a interface do jogo
         self._game_interface = GameInterface(self)
         self._game_interface.reset_timer()
+        
+        # Inicializa o spawn manager
+        self._spawn_manager = SpawnManager(self._tilemap, self._player)
+        self._spawn_manager.spawn_inimigos_iniciais()  # Spawna slimes iniciais
 
     def calcular_limite_mapa(self):
         """Calcula o limite inferior do mapa baseado nos tiles"""
@@ -182,6 +188,25 @@ class Jogo:
 
         self._estado = "game_over"
         self._menu.mostrar_game_over(tempo_jogo)
+        
+    def player_venceu(self):
+        """Chamado quando o player vence (derrota todos os inimigos)"""
+        tempo_jogo = None
+        if self._game_interface:
+            tempo_atual = pygame.time.get_ticks()
+            tempo_jogo = (tempo_atual - self._game_interface.start_time) // 1000
+            
+        # Salva o tempo no ranking apenas para jogadores que completaram
+        if hasattr(self._menu, 'adicionar_ao_ranking'):
+            self._menu.adicionar_ao_ranking(self._nome_jogador, tempo_jogo)
+            
+        self._estado = "vitoria"
+        if hasattr(self._menu, 'mostrar_vitoria'):
+            self._menu.mostrar_vitoria(tempo_jogo)
+        else:
+            # Fallback se o método não existir
+            self._estado = "game_over"
+            self._menu.mostrar_game_over(tempo_jogo)
 
     def inicializar_jogo(self):
         """Método mantido para compatibilidade"""
@@ -220,6 +245,14 @@ class Jogo:
         self._player.update(self._tilemap, self)
         self._player.renderizar(self._display, offset=camera_movement)
         
+        # Atualiza e renderiza inimigos
+        if self._spawn_manager:
+            self._spawn_manager.update()
+            self._spawn_manager.render(self._display, camera_movement)
+            
+            # Verifica colisões entre projéteis e inimigos
+            self._spawn_manager.verificar_colisoes_projeteis(self.projeteis)
+        
         for projetil in self.projeteis:
             projetil.update(self, self._tilemap)
             projetil.renderizar(self._display, offset=camera_movement)
@@ -232,6 +265,11 @@ class Jogo:
         # Verifica se o player morreu (vida zero)
         if self._player.vida <= 0:
             self.player_morreu()
+            return
+            
+        # Verifica se todos os inimigos foram derrotados
+        if self._spawn_manager and self._spawn_manager.get_inimigos_vivos() == 0:
+            self.player_venceu()
             return
 
         # Renderiza a interface do jogo
@@ -293,6 +331,19 @@ class Jogo:
                     self._menu.run()
                     if not self._menu.running:  # Se o menu foi fechado
                         print("Menu de game over foi fechado")
+                        # Verifica se deve voltar ao menu principal ou sair
+                        if self._menu.estado == "menu_principal":
+                            self._estado = "menu"
+                            print("Voltando ao menu principal")
+                        else:
+                            self._running = False
+                elif self._estado == "vitoria":
+                    print("Executando tela de vitória...")
+                    # Executa a tela de vitória
+                    self._menu.running = True
+                    self._menu.run()
+                    if not self._menu.running:  # Se o menu foi fechado
+                        print("Tela de vitória foi fechada")
                         # Verifica se deve voltar ao menu principal ou sair
                         if self._menu.estado == "menu_principal":
                             self._estado = "menu"

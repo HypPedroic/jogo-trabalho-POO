@@ -93,8 +93,10 @@ class MenuModerno:
             "nome": nome,
             "tempo": tempo,
         }
-        # Ordena por tempo (menor é melhor)
-        self.__ranking_data.sort(key=lambda x: x["tempo"])
+        # Adiciona o novo record à lista
+        self.__ranking_data.append(novo_record)
+        
+        # Ordena por tempo (menor é melhor), tratando registros antigos com 'distancia'
         self.__ranking_data.sort(
             key=lambda x: x.get("tempo", x.get("distancia", float("inf")))
         )
