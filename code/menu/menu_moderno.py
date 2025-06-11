@@ -34,8 +34,8 @@ class MenuModerno:
             )
             self.__fonte_botao = pygame.font.Font("assets/fonts/PixelifySans.ttf", 20)
             self.__fonte_texto = pygame.font.Font("assets/fonts/PixelifySans.ttf", 18)
-                self.__fonte_texto = pygame.font.Font(font_path, 18)
-                raise FileNotFoundError("Font file not found or invalid")
+            self.__fonte_texto = pygame.font.Font("assets/fonts/PixelifySans.ttf", 18)
+            raise FileNotFoundError("Font file not found or invalid")
         except:
             # Fallback para fontes do sistema
             self.__fonte_titulo = pygame.font.SysFont("Arial", 48, bold=True)
@@ -92,6 +92,7 @@ class MenuModerno:
         novo_record = {
             "nome": nome,
             "tempo": tempo,
+        }
         # Ordena por tempo (menor é melhor)
         self.__ranking_data.sort(key=lambda x: x["tempo"])
         self.__ranking_data.sort(

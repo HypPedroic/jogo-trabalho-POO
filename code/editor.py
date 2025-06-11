@@ -35,6 +35,7 @@ class Editor:
             'Pointers': load_images('Objetos/Pointers'),
             'Ridges': load_images('Objetos/Ridges'),
             'Willows': load_images('Objetos/Willows'),
+            'Spawners': load_images('Objetos/spawners'),
 
 
             #'stone': load_images('tiles/pedra'),  # Adicione mais tipos de tiles aqui
