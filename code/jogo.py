@@ -42,6 +42,11 @@ class Jogo:
         # Sistema de limbo
         self._limite_mapa_y = 1000  # Distância abaixo do mapa onde o player morre
         self._mapa_min_y = 0  # Será calculado baseado no tilemap
+        
+        self.projeteis = []  # Lista de projéteis no jogo
+        self.inimigos = [] # Lista de inimigos no jogo
+        
+
 
     # Properties para atributos que precisam ser acessados externamente
     @property
@@ -124,6 +129,7 @@ class Jogo:
         except FileNotFoundError:
             print("Mapa não encontrado, usando configuração padrão")
             self._mapa_min_y = 0
+            
 
         # Inicializa o background
         self._background = Background(self._screen.get_height())
@@ -211,8 +217,14 @@ class Jogo:
 
         self._tilemap.renderizar(self._display, offset=camera_movement)
 
-        self._player.update(self._tilemap)
+        self._player.update(self._tilemap, self)
         self._player.renderizar(self._display, offset=camera_movement)
+        
+        for projetil in self.projeteis:
+            projetil.update(self, self._tilemap)
+            projetil.renderizar(self._display, offset=camera_movement)
+            if projetil.vida <= 0:
+                self.projeteis.remove(projetil)
 
         # Verifica se o player caiu no limbo
         self.verificar_limbo()
@@ -236,7 +248,9 @@ class Jogo:
                 if event.key == pygame.K_UP:
                     self._player.pular()
                 if event.key == pygame.K_q:
-                    self._player.alterar_estado()
+                    self._player.ativar_furia()
+                if event.key == pygame.K_SPACE:
+                    self._player.atacar()
                 # Tecla ESC para voltar ao menu
                 if event.key == pygame.K_ESCAPE:
                     self._estado = "menu"

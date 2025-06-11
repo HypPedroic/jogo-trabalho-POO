@@ -2,6 +2,7 @@ import pygame
 from .entidade import Entidade
 from utils.utils import load_images
 from utils.animation import Animation
+from projeteis.projeteis import Projetil
 
 class Player(Entidade):
     def __init__(self, pos, tamanho):
@@ -13,6 +14,7 @@ class Player(Entidade):
             'idleFoice': Animation(load_images('player/idleFoice'), img_dur=12),
             'runFoice': Animation(load_images('player/runFoice'), img_dur=24),
             'jumpFoice': Animation(load_images('player/jumpFoice'), img_dur=16),
+            'attack': Animation(load_images('player/attack'), img_dur=8),
         }
         
         # Chamando o construtor da classe pai
@@ -21,12 +23,11 @@ class Player(Entidade):
         self._vidaMax = 3
         self._vida = self._vidaMax
         self._estado = 'normal'
+        self._furia = 5
         self._pulos_disponiveis = 2
         self._iFrames = False
         self._air_time = 0
-        self._tempo_queda = 0  # Tempo desde que começou a cair
-        self._tempo_max_queda = 15  # Tempo máximo antes de perder os pulos (ajuste conforme necessário)
-        self._caindo = False  # Flag para identificar se está caindo sem ter pulado
+        self._atacando = 0
 
     @property
     def vidaMax(self):
@@ -100,33 +101,80 @@ class Player(Entidade):
     def caindo(self, valor):
         self._caindo = valor
     
-    def update(self, tilemap):
+    @property
+    def furia(self):
+        return self._furia
+    
+    @furia.setter
+    def furia(self, valor):
+        self._furia = valor
+
+    @property
+    def atacando(self):
+        return self._atacando
+    
+    @atacando.setter
+    def atacando(self, valor):
+        self._atacando = valor
+    
+    def update(self, tilemap, game):
         super().update(tilemap)
+        self.animacao_atual(game)
 
-
-
+    def fisica_colisao_Y(self, tilemap):
+        super().fisica_colisao_Y(tilemap)
         self.air_time += 1
-        
-        # Verifica se está no chão
         if self.colisoes['baixo']:
             self.air_time = 0
             self.pulos_disponiveis = 2
-            self._tempo_queda = 0
-            self._caindo = False
+
+    def pular(self):
+        if self.pulos_disponiveis > 1:
+            self.velocidade[1] = -6
+            self.pulos_disponiveis -= 1
+            self.air_time = 5
+        elif self.pulos_disponiveis == 1:
+            self.velocidade[1] = -6
+            self.pulos_disponiveis -= 1
+            self.air_time = 5
+
+    def ativar_furia(self):
+        if self.furia == 100:
+            self.estado = 'foice'
+
+    def atacar(self):
+        if self.estado == 'normal':
+            self.atacando = 64
+        elif self.estado == 'foice':
+            pass
+
+    def ataque_normal(self, game):
+        if self.flip:
+            x = self.pos[0] - self.tamanho[0]
         else:
-            # Se não está no chão e não está subindo (velocidade positiva = caindo)
-            if self.velocidade[1] > 0 and not self._caindo:
-                self._caindo = True
-                self._tempo_queda = 0
+            x = self.pos[0] + self.tamanho[0]
             
-            # Se está caindo, incrementa o tempo de queda
-            if self._caindo:
-                self._tempo_queda += 1
-                # Se passou do tempo máximo e ainda tem pulos disponíveis
-                if self._tempo_queda >= self._tempo_max_queda and self.pulos_disponiveis > 1:
-                    self.pulos_disponiveis = 1
+        y = self.pos[1]
+            
+        if self.flip == True:
+            direcao = [False, True]
+        else:
+            direcao = [True, False]
+
+        projetil = Projetil([x, y], [32, 32], direcao)
         
-        if self.air_time > 4:
+        game.projeteis.append(projetil)
+
+    def ataque_furia(self):
+        pass
+
+    def animacao_atual(self, game):
+        if self.atacando > 0:
+            self.set_action('attack')
+            self.atacando -= 1
+            if self.atacando == 24:
+                self.ataque_normal(game)
+        elif self.air_time > 4:
             if self.estado == 'normal':
                 self.set_action('jump')
             elif self.estado == 'foice':
@@ -141,24 +189,5 @@ class Player(Entidade):
                 self.set_action('idle')
             elif self.estado == 'foice':
                 self.set_action('idleFoice')
-
-    def pular(self):
-        if self.pulos_disponiveis > 1:
-            self.velocidade[1] = -6
-            self.pulos_disponiveis -= 1
-            self.air_time = 5
-            self._caindo = False  # Reseta o estado de queda ao pular
-        elif self.pulos_disponiveis == 1:
-            self.velocidade[1] = -6
-            self.pulos_disponiveis -= 1
-            self.air_time = 5
-            self._caindo = False  # Reseta o estado de queda ao pular
-
-    def alterar_estado(self):
-        if self.estado == 'normal':
-            self.estado = 'foice'
-            self.anim_offeset = (-8, -16)
-        elif self.estado == 'foice':
-            self.estado = 'normal'
-            self.anim_offeset = (-8, 0)
+                
 
