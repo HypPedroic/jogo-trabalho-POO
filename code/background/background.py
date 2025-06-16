@@ -3,8 +3,8 @@ import json
 
 class Background:
     def __init__(self, screen_height):
-        self.screen_height = screen_height
-        self.layers = []
+        self.__screen_height = screen_height
+        self.__layers = []
         
     def add_layer(self, image_path, scroll_speed):
         """
@@ -12,24 +12,24 @@ class Background:
         :param image_path: Caminho da imagem da camada
         :param scroll_speed: Velocidade de rolagem (1.0 = velocidade normal, 0.5 = metade da velocidade, etc)
         """
-        layer = BackgroundLayer(image_path, scroll_speed, self.screen_height)
-        self.layers.append(layer)
+        layer = BackgroundLayer(image_path, scroll_speed, self.__screen_height)
+        self.__layers.append(layer)
         
     def update(self, camera_pos):
         """Atualiza a posição de todas as camadas"""
-        for layer in self.layers:
+        for layer in self.__layers:
             layer.update(camera_pos)
     
     def render(self, surface):
         """Renderiza todas as camadas do background"""
-        for layer in self.layers:
+        for layer in self.__layers:
             layer.render(surface)
             
     def save(self, filepath):
         """Salva a configuração do background em um arquivo JSON"""
         data = {
-            'screen_height': self.screen_height,
-            'layers': [layer.to_dict() for layer in self.layers]
+            'screen_height': self.__screen_height,
+            'layers': [layer.to_dict() for layer in self.__layers]
         }
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=4)
@@ -48,6 +48,6 @@ class Background:
     
     def resize(self, new_height):
         """Redimensiona todas as camadas para uma nova altura"""
-        self.screen_height = new_height
-        for layer in self.layers:
-            layer.resize(new_height) 
+        self.__screen_height = new_height
+        for layer in self.__layers:
+            layer.resize(new_height)

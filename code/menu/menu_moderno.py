@@ -2,6 +2,8 @@
 import pygame
 import json
 import os
+import math
+import random
 from datetime import datetime
 
 
@@ -89,10 +91,21 @@ class MenuModerno:
 
     def adicionar_ao_ranking(self, nome, tempo):
         """Adiciona um novo record ao ranking"""
+        agora = datetime.now()
         novo_record = {
             "nome": nome,
             "tempo": tempo,
+            "data": agora.strftime("%d/%m/%Y"),
+            "hora": agora.strftime("%H:%M:%S")
         }
+        
+        # Verifica se já existe um registro idêntico
+        for record in self.__ranking_data:
+            if (record.get("nome") == nome and 
+                record.get("tempo") == tempo and 
+                record.get("data") == novo_record["data"]):
+                return  # Não adiciona se já existir um registro idêntico
+        
         # Adiciona o novo record à lista
         self.__ranking_data.append(novo_record)
         
@@ -174,21 +187,25 @@ class MenuModerno:
         self.estado = "input_nome"
         self.__nome_jogador = ""
         self.__input_ativo = True
+        self.__botao_selecionado = 0
         self.criar_botoes_input_nome()
 
     def ir_para_ranking(self):
         """Vai para a tela de ranking"""
         self.estado = "ranking"
+        self.__botao_selecionado = 0
         self.criar_botoes_ranking()
 
     def voltar_menu_principal(self):
         """Volta para o menu principal"""
         self.estado = "menu_principal"
+        self.__botao_selecionado = 0
         self.criar_botoes_menu_principal()
 
     def voltar_menu_principal_game_over(self):
         """Volta para o menu principal a partir do game over"""
         self.estado = "menu_principal"
+        self.__botao_selecionado = 0
         self.criar_botoes_menu_principal()
         self.running = False
 
@@ -205,9 +222,9 @@ class MenuModerno:
 
     def mostrar_game_over(self, tempo_jogo=None):
         """Mostra a tela de game over"""
-        if tempo_jogo and self.__nome_jogador:
-            self.adicionar_ao_ranking(self.__nome_jogador, tempo_jogo)
+        # O ranking será adicionado na tela de vitória, não no game over
         self.estado = "game_over"
+        self.__botao_selecionado = 0
         self.criar_botoes_game_over()
 
     def sair(self):
@@ -289,18 +306,36 @@ class MenuModerno:
         titulo_rect = titulo.get_rect(center=(self.__largura // 2, 80))
         self.__screen.blit(titulo, titulo_rect)
 
+        # Cabeçalhos das colunas
+        cabecalho_y = 130
+        pos_header = self.__fonte_texto.render("#", True, self.__cor_acento)
+        self.__screen.blit(pos_header, (100, cabecalho_y))
+        
+        nome_header = self.__fonte_texto.render("NOME", True, self.__cor_acento)
+        self.__screen.blit(nome_header, (140, cabecalho_y))
+        
+        tempo_header = self.__fonte_texto.render("TEMPO", True, self.__cor_acento)
+        self.__screen.blit(tempo_header, (320, cabecalho_y))
+        
+        data_header = self.__fonte_texto.render("DATA", True, self.__cor_acento)
+        self.__screen.blit(data_header, (420, cabecalho_y))
+        
+        hora_header = self.__fonte_texto.render("HORA", True, self.__cor_acento)
+        self.__screen.blit(hora_header, (520, cabecalho_y))
+
         # Lista os records
-        y_start = 150
+        y_start = 160
         for i, record in enumerate(self.__ranking_data[:10]):
-            y_pos = y_start + i * 35
+            y_pos = y_start + i * 30
 
             # Posição
             pos_text = self.__fonte_texto.render(f"{i+1}.", True, self.__cor_acento)
             self.__screen.blit(pos_text, (100, y_pos))
 
-            # Nome
+            # Nome (limitado a 12 caracteres)
+            nome_display = record["nome"][:12] + "..." if len(record["nome"]) > 12 else record["nome"]
             nome_text = self.__fonte_texto.render(
-                record["nome"], True, self.__cor_texto
+                nome_display, True, self.__cor_texto
             )
             self.__screen.blit(nome_text, (140, y_pos))
 
@@ -314,13 +349,13 @@ class MenuModerno:
                 )
             elif "distancia" in record:
                 tempo_text = self.__fonte_texto.render(
-                    f"Dist: {record['distancia']}", True, self.__cor_texto_secundario
+                    f"{record['distancia']}", True, self.__cor_texto_secundario
                 )
             else:
                 tempo_text = self.__fonte_texto.render(
                     "--:--", True, self.__cor_texto_secundario
                 )
-            self.__screen.blit(tempo_text, (400, y_pos))
+            self.__screen.blit(tempo_text, (320, y_pos))
 
             # Data
             if "data" in record:
@@ -329,9 +364,20 @@ class MenuModerno:
                 )
             else:
                 data_text = self.__fonte_texto.render(
-                    "--/--/----", True, self.__cor_texto_secundario
+                    "--/--/--", True, self.__cor_texto_secundario
                 )
-            self.__screen.blit(data_text, (500, y_pos))
+            self.__screen.blit(data_text, (420, y_pos))
+            
+            # Hora
+            if "hora" in record:
+                hora_text = self.__fonte_texto.render(
+                    record["hora"], True, self.__cor_texto_secundario
+                )
+            else:
+                hora_text = self.__fonte_texto.render(
+                    "--:--:--", True, self.__cor_texto_secundario
+                )
+            self.__screen.blit(hora_text, (520, y_pos))
 
         if not self.__ranking_data:
             texto = self.__fonte_subtitulo.render(

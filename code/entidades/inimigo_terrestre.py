@@ -8,17 +8,17 @@ from entidades.projetil import Projetil
 class InimigoTerrestre(Inimigo):
     def __init__(self, game, pos):
         super().__init__(game, 'inimigo_terrestre', pos, (32, 32), vida=2)
-        self._velocidade_movimento = 1
-        self._alcance_ataque = 300  # Distância máxima para atacar o jogador
-        self._dano_projetil = 1
-        self._estado = 'parado'  # 'parado', 'correndo', 'atacando'
-        self._animacao_frame = 0
-        self._animacao_velocidade = 0.1
-        self._direcao_sprite = 1  # 1 para direita, -1 para esquerda
+        self.__velocidade_movimento = 1
+        self.__alcance_ataque = 300  # Distância máxima para atacar o jogador
+        self.__dano_projetil = 1
+        self.__estado = 'parado'  # 'parado', 'correndo', 'atacando'
+        self.__animacao_frame = 0
+        self.__animacao_velocidade = 0.1
+        self.__direcao_sprite = 1  # 1 para direita, -1 para esquerda
     
     def atacar(self):
         """Método para o inimigo terrestre atacar (atirar)"""
-        if self._tempo_ataque >= self._intervalo_ataque:
+        if self.__tempo_ataque >= self.__intervalo_ataque:
             # Calcula a direção para o jogador
             jogador_pos = self.game.player.pos
             jogador_centro = [
@@ -54,20 +54,20 @@ class InimigoTerrestre(Inimigo):
             )
             
             # Reseta o tempo de ataque
-            self._tempo_ataque = 0
+            self.__tempo_ataque = 0
     
     def update(self, movement=(0, 0)):
         """Atualiza o estado do inimigo terrestre"""
-        if not self._ativo:
+        if not self.ativo:
             return
         
         # Incrementa o tempo desde o último ataque
-        self._tempo_ataque += 1
+        self.__tempo_ataque += 1
         
         # Atualiza o frame da animação
-        self._animacao_frame += self._animacao_velocidade
-        if self._animacao_frame >= len(self.game.assets[self.e_tipo]):
-            self._animacao_frame = 0
+        self.__animacao_frame += self.__animacao_velocidade
+        if self.__animacao_frame >= len(self.game.assets[self.e_tipo]):
+            self.__animacao_frame = 0
         
         # Verifica se o jogador está próximo para atacar
         if self.detectar_jogador():
@@ -77,40 +77,40 @@ class InimigoTerrestre(Inimigo):
             distancia = math.sqrt(dx*dx + dy*dy)
             
             # Atualiza a direção do sprite
-            self._direcao_sprite = 1 if dx > 0 else -1
+            self.__direcao_sprite = 1 if dx > 0 else -1
             
-            if distancia <= self._alcance_ataque:
+            if distancia <= self.__alcance_ataque:
                 # Para de se mover e ataca
                 movement = (0, 0)
                 self.atacar()
             else:
                 # Move em direção ao jogador
-                movement = (self._velocidade_movimento * self._direcao, 0)
+                movement = (self.__velocidade_movimento * self.__direcao, 0)
         else:
             # Comportamento de patrulha quando não detecta o jogador
             if self.colisoes['esquerda'] or self.colisoes['direita']:
-                self._direcao *= -1
+                self.__direcao *= -1
             
-            self._direcao_sprite = self._direcao
-            movement = (self._velocidade_movimento * self._direcao, 0)
+            self.__direcao_sprite = self.__direcao
+            movement = (self.__velocidade_movimento * self.__direcao, 0)
         
         # Chama o método update da classe pai
         super().update(movement)
     
     def renderizar(self, surf, offset=(0, 0)):
         """Renderiza o inimigo na tela"""
-        if not self._ativo:
+        if not self.ativo:
             return
             
         # Obtém o frame atual da animação
-        frame = int(self._animacao_frame)
-        if frame >= len(self.game.assets[self.e_tipo][self._estado]):
+        frame = int(self.__animacao_frame)
+        if frame >= len(self.game.assets[self.e_tipo][self.__estado]):
             frame = 0
             
-        imagem = self.game.assets[self.e_tipo][self._estado][frame]
+        imagem = self.game.assets[self.e_tipo][self.__estado][frame]
         
         # Inverte a imagem se o inimigo estiver indo para a esquerda
-        if self._direcao == -1:
+        if self.__direcao == -1:
             imagem = pygame.transform.flip(imagem, True, False)
         
         # Renderiza o inimigo

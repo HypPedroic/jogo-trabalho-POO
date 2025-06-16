@@ -1,0 +1,28 @@
+Traceback (most recent call last):
+  File "C:\dev\jogo-trabalho-POO\jogo-trabalho-POO\code\jogo.py", line 743, in <module>
+    jogo = Jogo()
+  File "C:\dev\jogo-trabalho-POO\jogo-trabalho-POO\code\jogo.py", line 43, in __init__
+    self.__inicializar_sistema_audio()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\dev\jogo-trabalho-POO\jogo-trabalho-POO\code\jogo.py", line 102, in __inicializar_sistema_audio
+    self.__carregar_sons()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\dev\jogo-trabalho-POO\jogo-trabalho-POO\code\jogo.py", line 221, in __carregar_sons
+    self.__sons[nome] = pygame.mixer.Sound(caminho)
+                        ~~~~~~~~~~~~~~~~~~^^^^^^^^^
+FileNotFoundError: No file 'data/sounds/sound-tiro.wav' found in working directory 'C:\dev\jogo-trabalho-POO\jogo-trabalho-POO\code'.
+pygame 2.6.1 (SDL 2.28.4, Python 3.13.3)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+Iniciando o jogo...
+Pygame inicializado com sucesso!
+Iniciando construtor do Jogo...
+Inicializando pygame...
+Pygame inicializado!
+Pygame inicializado no construtor
+Display inicializado
+Estados inicializados
+Criando menu moderno...
+Menu moderno criado!
+Callback do menu configurado!
+Componentes bßsicos inicializados
+Erro ao inicializar o jogo: No file 'data/sounds/sound-tiro.wav' found in working directory 'C:\dev\jogo-trabalho-POO\jogo-trabalho-POO\code'.

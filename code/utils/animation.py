@@ -1,64 +1,64 @@
 class Animation:
     def __init__(self, images, img_dur, loop = True):
-        self._images = images
-        self._img_duration = img_dur
-        self._loop = loop
-        self._done = False
-        self._frame = 0
+        self.__images = images
+        self.__img_duration = img_dur
+        self.__loop = loop
+        self.__done = False
+        self.__frame = 0
 
     @property
     def images(self):
-        return self._images
+        return self.__images
     
     @images.setter
     def images(self, valor):
-        self._images = valor
+        self.__images = valor
 
     @property
     def img_duration(self):
-        return self._img_duration
+        return self.__img_duration
     
     @img_duration.setter
     def img_duration(self, valor):
-        self._img_duration = valor
+        self.__img_duration = valor
 
     @property
     def loop(self):
-        return self._loop
+        return self.__loop
     
     @loop.setter
     def loop(self, valor):
-        self._loop = valor
+        self.__loop = valor
 
     @property
     def done(self):
-        return self._done
+        return self.__done
     
     @done.setter
     def done(self, valor):
-        self._done = valor
+        self.__done = valor
 
     @property
     def frame(self):
-        return self._frame
+        return self.__frame
     
     @frame.setter
     def frame(self, valor):
-        self._frame = valor
+        self.__frame = valor
 
     def copy(self):
-        return Animation(self.images, self.img_duration, self.loop)
+        return Animation(self.__images, self.__img_duration, self.__loop)
     
     def img(self):
-        return self.images[int(self.frame / self.img_duration)]
+        return self.__images[int(self.__frame / self.__img_duration)]
     
     def update(self):
-        if self.loop:
-            self.frame = (self.frame + 1) % (self.img_duration * len(self.images))
+        if self.__loop:
+            self.__frame = (self.__frame + 1) % (self.__img_duration * len(self.__images))
         else:
-            self.frame = min(self.frame + 1, self.img_duration * len(self.images) - 1)
-            if self.frame >= self.img_duration * len(self.images) - 1:
-                self.done = True
+            self.__frame = min(self.__frame + 1, self.__img_duration * len(self.__images) - 1)
+            if self.__frame >= self.__img_duration * len(self.__images) - 1:
+                self.__done = True
             
 
     

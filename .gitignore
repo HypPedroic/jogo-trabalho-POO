@@ -1,4 +1,27 @@
 __pycache__/
-*.py[cod]
-*$py.class
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+
+# Distribution / packaging
 .Python
+build/
+dist/
+wheels/
+*.egg-info/
+
+# Environments
+.env
+.venv
+env/
+venv/
+
+# Editors
+.vscode/
+.idea/
+
+# Logs and other temporary files
+*.log
+*.tmp
