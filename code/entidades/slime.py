@@ -166,13 +166,14 @@ class Slime(Entidade):
         # Calcula direção para o jogador
         if self.__player.pos[0] > self.pos[0]:
             self.__direcao = 1
-            self.flip = False
+            self.flip = True
         else:
             self.__direcao = -1
-            self.flip = True
+            self.flip = False
         
-        # Move na direção do jogador
+        # Move na direção do jogador e muda a animação para ataque
         self.velocidade[0] = self.__direcao * self.__velocidade_perseguicao
+        self.set_action('ataque')
     
     def __patrulhar(self):
         """Movimento de patrulha"""
@@ -180,9 +181,9 @@ class Slime(Entidade):
         if self.__tempo_patrulha <= 0 or self.__detectar_borda():
             self.__direcao *= -1
             self.__tempo_patrulha = self.__intervalo_mudanca_direcao
-            self.flip = self.__direcao < 0
+            self.flip = self.__direcao > 0
         
-        # Move na direção atual
+        # Move na direção atual e atualiza animação
         self.velocidade[0] = self.__direcao * self.__velocidade_patrulha
         self.__tempo_patrulha -= 1
     
@@ -233,7 +234,6 @@ class Slime(Entidade):
             else:
                 self.__estado = 'perseguindo'
                 self.__mover_para_jogador()
-                self.set_action('andar')
         else:
             self.__estado = 'patrulhando'
             self.__patrulhar()
@@ -243,13 +243,23 @@ class Slime(Entidade):
         super().update(tilemap)
         return True
     
+    def get_current_sprite(self):
+        """Retorna a sprite atual da animação"""
+        return self.animation.img()
+
     def render(self, surf, offset=(0, 0)):
         """Renderiza o slime"""
         if self.__estado == 'morto' and self.__tempo_animacao_morte >= self.__duracao_animacao_morte:
             return  # Não renderiza se a animação de morte terminou
         
-        # Efeito de piscar durante iframes
-        if self.__iframes > 0 and self.__iframes % 6 < 3:
-            return  # Pisca não renderizando
+        # Efeito de piscar durante iframes com transparência ao invés de não renderizar
+        alpha = 255
+        if self.__iframes > 0:
+            alpha = 128 if self.__iframes % 4 < 2 else 255
         
-        super().renderizar(surf, offset)
+        # Renderiza com transparência
+        sprite = self.get_current_sprite().copy()
+        if self.flip:
+            sprite = pygame.transform.flip(sprite, True, False)
+        sprite.set_alpha(alpha)
+        surf.blit(sprite, (self.pos[0] - offset[0], self.pos[1] - offset[1]))

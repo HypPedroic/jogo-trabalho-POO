@@ -4,12 +4,12 @@ import random
 from .slime import Slime
 
 class SpawnManager:
-    def __init__(self, tilemap, player):
+    def __init__(self, tilemap, player, num_inimigos=15):
         self.__tilemap = tilemap
         self.__player = player
         self.__inimigos = []
-        self.__max_inimigos = 5  # Quantidade fixa de inimigos no mapa
-        self.__inimigos_totais = 5  # Total de inimigos que existirão no jogo
+        self.__max_inimigos = num_inimigos  # Quantidade de inimigos no mapa baseada na dificuldade
+        self.__inimigos_totais = num_inimigos  # Total de inimigos que existirão no jogo
         self.__inimigos_mortos = 0  # Contador de inimigos mortos
         self.__posicoes_spawn = []
         self.__ultimo_spawn = 0

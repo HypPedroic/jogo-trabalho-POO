@@ -18,6 +18,20 @@ class MenuModerno:
         # Estados
         self.running = True
         self.estado = "menu_principal"  # menu_principal, ranking, input_nome, game_over
+        
+        # Sistema de dificuldade
+        self.__dificuldades = ["FÁCIL", "NORMAL", "DIFÍCIL"]
+        self.__cores_dificuldade = {
+            "FÁCIL": (0, 255, 0),  # Verde
+            "NORMAL": (255, 255, 0),  # Amarelo
+            "DIFÍCIL": (255, 0, 0)  # Vermelho
+        }
+        self.__dificuldade_atual = "NORMAL"
+        self.__inimigos_por_dificuldade = {
+            "FÁCIL": 5,
+            "NORMAL": 15,
+            "DIFÍCIL": 30
+        }
 
         # Esquema de cores moderno
         self.__cor_primaria = (64, 224, 208)  # Turquesa
@@ -151,19 +165,14 @@ class MenuModerno:
         """Cria os botões da tela de game over"""
         self.__botoes = [
             {
-                "texto": "JOGAR NOVAMENTE",
-                "acao": self.reiniciar_jogo,
-                "rect": pygame.Rect(self.__largura // 2 - 120, 350, 240, 50),
-            },
-            {
                 "texto": "MENU PRINCIPAL",
                 "acao": self.voltar_menu_principal_game_over,
-                "rect": pygame.Rect(self.__largura // 2 - 120, 420, 240, 50),
+                "rect": pygame.Rect(self.__largura // 2 - 120, 350, 240, 50),
             },
             {
                 "texto": "SAIR",
                 "acao": self.sair,
-                "rect": pygame.Rect(self.__largura // 2 - 120, 490, 240, 50),
+                "rect": pygame.Rect(self.__largura // 2 - 120, 420, 240, 50),
             },
         ]
 
@@ -205,6 +214,7 @@ class MenuModerno:
     def voltar_menu_principal_game_over(self):
         """Volta para o menu principal a partir do game over"""
         self.estado = "menu_principal"
+        self.__nome_jogador = ""
         self.__botao_selecionado = 0
         self.criar_botoes_menu_principal()
         self.running = False
@@ -212,13 +222,19 @@ class MenuModerno:
     def confirmar_nome(self):
         """Confirma o nome do jogador e inicia o jogo"""
         if self.__nome_jogador.strip():
-            return self.__nome_jogador.strip()
+            return True
+        return False
 
     def reiniciar_jogo(self):
-        """Reinicia o jogo"""
-        if self.callback_iniciar_jogo:
-            self.callback_iniciar_jogo(self.__nome_jogador)
-        return self.__nome_jogador.strip()
+        """Reinicia o jogo com o mesmo nome do jogador"""
+        if self.callback_iniciar_jogo and self.__nome_jogador.strip():
+            self.callback_iniciar_jogo({
+                "nome": self.__nome_jogador.strip(),
+                "dificuldade": self.__dificuldade_atual,
+                "num_inimigos": self.__inimigos_por_dificuldade[self.__dificuldade_atual]
+            })
+            return True
+        return False
 
     def mostrar_game_over(self, tempo_jogo=None):
         """Mostra a tela de game over"""
@@ -286,15 +302,29 @@ class MenuModerno:
 
     def desenhar_menu_principal(self, mouse_pos):
         """Desenha o menu principal"""
-        titulo = self.__fonte_titulo.render("JOGO SEM NOME", True, self.__cor_primaria)
+        titulo = self.__fonte_titulo.render("REAPERQUEST", True, self.__cor_primaria)
         titulo_rect = titulo.get_rect(center=(self.__largura // 2, 150))
         self.__screen.blit(titulo, titulo_rect)
 
-        subtitulo = self.__fonte_subtitulo.render(
-            "NO MOMENTO", True, self.__cor_texto_secundario
+        # Desenha o seletor de dificuldade
+        dificuldade_texto = self.__fonte_subtitulo.render(
+            f"Dificuldade: {self.__dificuldade_atual}",
+            True,
+            self.__cores_dificuldade[self.__dificuldade_atual]
         )
-        subtitulo_rect = subtitulo.get_rect(center=(self.__largura // 2, 200))
-        self.__screen.blit(subtitulo, subtitulo_rect)
+        dificuldade_rect = dificuldade_texto.get_rect()
+        dificuldade_rect.topright = (self.__largura - 20, 20)
+        self.__screen.blit(dificuldade_texto, dificuldade_rect)
+
+        # Desenha instruções de dificuldade
+        instrucoes = self.__fonte_subtitulo.render(
+            "← → para mudar dificuldade",
+            True,
+            self.__cor_texto_secundario
+        )
+        instrucoes_rect = instrucoes.get_rect()
+        instrucoes_rect.topright = (self.__largura - 20, 60)
+        self.__screen.blit(instrucoes, instrucoes_rect)
 
         # Desenha botões
         for i, botao in enumerate(self.__botoes):
@@ -450,12 +480,27 @@ class MenuModerno:
         if event.type == pygame.KEYDOWN:
             if self.estado == "input_nome" and self.__input_ativo:
                 if event.key == pygame.K_RETURN:
-                    return self.__nome_jogador.strip()
+                    if self.__nome_jogador.strip():
+                        return {
+                            "nome": self.__nome_jogador.strip(),
+                            "dificuldade": self.__dificuldade_atual,
+                            "num_inimigos": self.__inimigos_por_dificuldade[self.__dificuldade_atual]
+                        }
                 elif event.key == pygame.K_BACKSPACE:
                     self.__nome_jogador = self.__nome_jogador[:-1]
                 elif event.unicode.isprintable() and len(self.__nome_jogador) < 20:
                     self.__nome_jogador += event.unicode
             else:
+                if self.estado == "menu_principal":
+                    if event.key == pygame.K_LEFT:
+                        # Muda para a dificuldade anterior
+                        atual_index = self.__dificuldades.index(self.__dificuldade_atual)
+                        self.__dificuldade_atual = self.__dificuldades[(atual_index - 1) % len(self.__dificuldades)]
+                    elif event.key == pygame.K_RIGHT:
+                        # Muda para a próxima dificuldade
+                        atual_index = self.__dificuldades.index(self.__dificuldade_atual)
+                        self.__dificuldade_atual = self.__dificuldades[(atual_index + 1) % len(self.__dificuldades)]
+                
                 if event.key == pygame.K_UP:
                     self.__botao_selecionado = (self.__botao_selecionado - 1) % len(
                         self.__botoes
@@ -469,9 +514,12 @@ class MenuModerno:
                         botao = self.__botoes[self.__botao_selecionado]
                         if botao["acao"]:
                             resultado = botao["acao"]()
-                            if resultado:
-                                return resultado
-                    return self.__nome_jogador.strip()
+                            if resultado and self.estado == "input_nome" and self.__nome_jogador.strip() and botao["texto"] == "CONFIRMAR":
+                                return {
+                                    "nome": self.__nome_jogador.strip(),
+                                    "dificuldade": self.__dificuldade_atual,
+                                    "num_inimigos": self.__inimigos_por_dificuldade[self.__dificuldade_atual]
+                                }
         return None
 
     def processar_input_mouse(self, event, mouse_pos):
@@ -486,9 +534,12 @@ class MenuModerno:
                     self.__botao_selecionado = i
                     if botao["acao"]:
                         resultado = botao["acao"]()
-                        if resultado:
-                            return resultado
-                    return self.__nome_jogador.strip()
+                        if resultado and self.estado == "input_nome" and self.__nome_jogador.strip() and botao["texto"] == "CONFIRMAR":
+                            return {
+                                "nome": self.__nome_jogador.strip(),
+                                "dificuldade": self.__dificuldade_atual,
+                                "num_inimigos": self.__inimigos_por_dificuldade[self.__dificuldade_atual]
+                            }
         elif event.type == pygame.MOUSEMOTION:
             for i, botao in enumerate(self.__botoes):
                 if botao["rect"].collidepoint(mouse_pos):
@@ -532,4 +583,10 @@ class MenuModerno:
             self.__clock.tick(60)
 
         print(f"Menu finalizado - Nome: {self.__nome_jogador}")
-        return self.__nome_jogador if self.__nome_jogador else None
+        if self.__nome_jogador and self.__nome_jogador.strip():
+            return {
+                "nome": self.__nome_jogador.strip(),
+                "dificuldade": self.__dificuldade_atual,
+                "num_inimigos": self.__inimigos_por_dificuldade[self.__dificuldade_atual]
+            }
+        return None

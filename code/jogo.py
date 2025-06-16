@@ -23,7 +23,7 @@ class Jogo:
         print("Pygame inicializado!")
         self.__screen = pygame.display.set_mode((832, 640))
         self.__display = pygame.Surface((624, 480))
-        pygame.display.set_caption("JOGO SEM NOME NO MOMENTO")
+        pygame.display.set_caption("ReaperQuest 💀")
         self.__clock = pygame.time.Clock()
         self.__running = True
         self.__camera = [0, 0]
@@ -125,9 +125,11 @@ class Jogo:
     def game_interface(self):
         return self.__game_interface
 
-    def iniciar_jogo(self, nome_jogador):
-        """Inicia um novo jogo com o nome do jogador"""
-        self.nome_jogador = nome_jogador
+    def iniciar_jogo(self, dados_jogo):
+        """Inicia um novo jogo com o nome do jogador e configurações de dificuldade"""
+        self.nome_jogador = dados_jogo['nome']
+        self.__dificuldade = dados_jogo['dificuldade']
+        self.__num_inimigos = dados_jogo['num_inimigos']
         # Reset da flag para evitar duplicação no ranking
         if hasattr(self, '__ranking_adicionado'):
             delattr(self, '__ranking_adicionado')
@@ -192,8 +194,8 @@ class Jogo:
         self.__game_interface = GameInterface(self)
         self.__game_interface.reset_timer()
         
-        # Inicializa o spawn manager
-        self.__spawn_manager = SpawnManager(self.__tilemap, self.__player)
+        # Inicializa o spawn manager com a quantidade de inimigos baseada na dificuldade
+        self.__spawn_manager = SpawnManager(self.__tilemap, self.__player, self.__num_inimigos)
         self.__spawn_manager.game = self  # Passa referência do game
         self.__spawn_manager.spawn_todos_inimigos()  # Spawna todos os inimigos de uma vez
         
