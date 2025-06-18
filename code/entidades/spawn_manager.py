@@ -7,7 +7,8 @@ class SpawnManager:
     def __init__(self, tilemap, player, num_inimigos=15):
         self.__tilemap = tilemap
         self.__player = player
-        self.__inimigos = []
+        self.__inimigos_ativos = []
+        self.__inimigos_pool = []
         self.__max_inimigos = num_inimigos  # Quantidade de inimigos no mapa baseada na dificuldade
         self.__inimigos_totais = num_inimigos  # Total de inimigos que existirão no jogo
         self.__inimigos_mortos = 0  # Contador de inimigos mortos
@@ -18,6 +19,9 @@ class SpawnManager:
         
         # Sistema de limbo - inimigos morrem se caírem muito baixo
         self.__limite_limbo_y = 1000  # Distância abaixo do mapa onde inimigos morrem
+        
+        # Pré-cria pool de inimigos
+        self.__inicializar_pool()
         
         # Calcula posições válidas de spawn
         self.__calcular_posicoes_spawn()
@@ -99,6 +103,23 @@ class SpawnManager:
                         spawn_y = (tile_y - 1) * tilemap.tile_size - 16
                         self.__posicoes_spawn.append((spawn_x, spawn_y))
     
+    def __inicializar_pool(self):
+        """Inicializa a pool de inimigos"""
+        for _ in range(self.__max_inimigos):
+            slime = Slime((0, 0), (16, 16))  # Posição inicial não importa
+            self.__inimigos_pool.append(slime)
+    
+    def __obter_inimigo_da_pool(self):
+        """Obtém um inimigo da pool ou cria um novo se necessário"""
+        if self.__inimigos_pool:
+            return self.__inimigos_pool.pop()
+        return None
+    
+    def __retornar_inimigo_para_pool(self, inimigo):
+        """Retorna um inimigo para a pool"""
+        inimigo.reset()  # Reseta o estado do inimigo
+        self.__inimigos_pool.append(inimigo)
+    
     def __spawn_inimigo(self):
         """Spawna novos inimigos em posições aleatórias válidas"""
         if not self.__posicoes_spawn:
@@ -108,7 +129,7 @@ class SpawnManager:
             print("Nenhuma posição de spawn válida encontrada")
             return
         
-        if len(self.__inimigos) >= self.__max_inimigos:
+        if len(self.__inimigos_ativos) >= self.__max_inimigos:
             return
         
         # Escolhe uma posição aleatória
@@ -126,7 +147,7 @@ class SpawnManager:
             
             # Verifica distância de outros inimigos (mínimo 150 pixels)
             muito_perto = False
-            for inimigo in self.__inimigos:
+            for inimigo in self.__inimigos_ativos:
                 distancia_inimigo = ((pos_spawn[0] - inimigo.pos[0]) ** 2 + 
                                    (pos_spawn[1] - inimigo.pos[1]) ** 2) ** 0.5
                 if distancia_inimigo < 150:
@@ -134,11 +155,13 @@ class SpawnManager:
                     break
             
             if not muito_perto:
-                # Cria novo slime
-                novo_slime = Slime(pos_spawn, (16, 16))
-                self.__inimigos.append(novo_slime)
-                print(f"Slime spawnado em {pos_spawn}")
-                return
+                # Obtém um slime da pool
+                novo_slime = self.__obter_inimigo_da_pool()
+                if novo_slime:
+                    novo_slime.pos = list(pos_spawn)
+                    self.__inimigos_ativos.append(novo_slime)
+                    print(f"Slime spawnado em {pos_spawn}")
+                    return
             
             tentativas += 1
         
@@ -152,7 +175,7 @@ class SpawnManager:
     
     def update(self):
         """Atualiza todos os inimigos"""
-        for inimigo in self.__inimigos[:]:
+        for inimigo in self.__inimigos_ativos[:]:
             inimigo.update(self.__tilemap, self.__player)
             
             # Verifica colisão com o player
@@ -174,7 +197,8 @@ class SpawnManager:
             
             # Remove inimigos mortos e conta
             if inimigo.estado == 'morto' and inimigo.animacao_morte_completa:
-                self.__inimigos.remove(inimigo)
+                self.__inimigos_ativos.remove(inimigo)
+                self.__retornar_inimigo_para_pool(inimigo)
                 self.__inimigos_mortos += 1
                 print(f"Inimigo morto! Restam {self.get_inimigos_vivos()} inimigos.")
         
@@ -182,7 +206,7 @@ class SpawnManager:
     
     def renderizar(self, surf, offset=(0, 0)):
         """Renderiza todos os inimigos"""
-        for inimigo in self.__inimigos:
+        for inimigo in self.__inimigos_ativos:
             inimigo.render(surf, offset)
     
     def render(self, surf, offset=(0, 0)):
@@ -192,7 +216,7 @@ class SpawnManager:
     def verificar_colisao_projeteis(self, projeteis):
         """Verifica colisão entre projéteis e inimigos"""
         for projetil in projeteis[:]:
-            for inimigo in self.__inimigos[:]:
+            for inimigo in self.__inimigos_ativos[:]:
                 if inimigo.estado != 'morto':
                     # Verifica colisão com hitbox mais precisa
                     projetil_rect = pygame.Rect(projetil.pos[0] + 8, projetil.pos[1] + 8, 16, 16)
@@ -224,7 +248,7 @@ class SpawnManager:
     
     def get_inimigos_vivos(self):
         """Retorna o número de inimigos vivos"""
-        return len([inimigo for inimigo in self.__inimigos if inimigo.estado != 'morto'])
+        return len([inimigo for inimigo in self.__inimigos_ativos if inimigo.estado != 'morto'])
     
     def get_inimigos_mortos(self):
         """Retorna o número de inimigos mortos"""

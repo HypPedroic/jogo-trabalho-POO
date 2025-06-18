@@ -17,12 +17,12 @@ try:
     print("Screen created successfully")
 
     print("Importing menu...")
-    from code.menu.menu_moderno import MenuModerno
+    from code.menu.menu import Menu
 
     print("Menu imported successfully")
 
     print("Creating menu...")
-    menu = MenuModerno(screen)
+    menu = Menu(screen)
     print("Menu created successfully")
 
     print("All imports and initializations successful!")

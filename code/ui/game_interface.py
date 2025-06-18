@@ -177,8 +177,8 @@ class GameInterface:
     
     def __render_enemy_counter(self, surface):
         """Renderiza o contador de inimigos vivos"""
-        if hasattr(self.__game, '_Jogo__spawn_manager') and self.__game._Jogo__spawn_manager:
-            inimigos_vivos = self.__game._Jogo__spawn_manager.get_inimigos_vivos()
+        if hasattr(self.__game, '_GameManager__spawn_manager') and self.__game._GameManager__spawn_manager:
+            inimigos_vivos = self.__game._GameManager__spawn_manager.get_inimigos_vivos()
             enemy_text = f"Inimigos: {inimigos_vivos}"
             text_surface = pygame.font.Font(None, 28).render(enemy_text, True, (255, 255, 255))
             

@@ -15,6 +15,18 @@ class Entidade:
         self.__anim_offeset = (-8, 0)
         self.__flip = False
         self.__movimento = [False, False]  # [direita, esquerda]
+        
+        # Configuração de estados de animação
+        self.__estados_animacao = {
+            'idle': {'loop': True, 'next_state': None},
+            'walk': {'loop': True, 'next_state': None},
+            'attack': {'loop': False, 'next_state': 'idle'},
+            'hurt': {'loop': False, 'next_state': 'idle'},
+            'death': {'loop': False, 'next_state': None}
+        }
+        
+        # Configura as transições de estado inicial
+        self.__configurar_transicoes_animacao()
         self.set_action('idle')
     
     # Definindo property e setter para os atributos necessários    
@@ -96,7 +108,21 @@ class Entidade:
     def mover_esquerda(self, estado=True):
         self.__movimento[1] = estado
     
-    # Definindo os métodos necessários para movimentação, física e renderização 
+    def __configurar_transicoes_animacao(self):
+        """Configura as transições entre estados de animação"""
+        for estado, config in self.__estados_animacao.items():
+            if estado in self.__assets:
+                self.__assets[estado].loop = config['loop']
+                if config['next_state']:
+                    self.__assets[estado].add_state_transition(estado, config['next_state'])
+    
+    def set_action(self, action):
+        """Define a ação atual e configura a animação apropriada"""
+        if action != self.__action and action in self.__assets:
+            self.__action = action
+            self.__assets[self.__action].reset()
+    
+    # Definindo os métodos necessários para movimentação, física e renderização
     
     # Método para gerar o retângulo de colisão da entidade
     def retangulo(self):

@@ -7,7 +7,7 @@ import random
 from datetime import datetime
 
 
-class MenuModerno:
+class Menu:
     def __init__(self, screen, callback_iniciar_jogo=None):
         """Inicializa o menu moderno"""
         pygame.init()
@@ -243,6 +243,37 @@ class MenuModerno:
         self.__botao_selecionado = 0
         self.criar_botoes_game_over()
 
+    def criar_botoes_vitoria(self):
+        """Cria os botões da tela de vitória"""
+        self.__botoes = [
+            {
+                "texto": "MENU PRINCIPAL",
+                "acao": self.voltar_menu_principal_game_over,
+                "rect": pygame.Rect(self.__largura // 2 - 120, 350, 240, 50),
+            },
+            {
+                "texto": "SAIR",
+                "acao": self.sair,
+                "rect": pygame.Rect(self.__largura // 2 - 120, 420, 240, 50),
+            },
+        ]
+
+    def mostrar_vitoria(self, tempo_jogo, estatisticas):
+        """Mostra a tela de vitória com estatísticas"""
+        self.estado = "vitoria"
+        self.__botao_selecionado = 0
+        self.criar_botoes_vitoria()
+        
+        # Armazena as estatísticas para exibição
+        self.__tempo_jogo = tempo_jogo
+        self.__inimigos_mortos = estatisticas.get('inimigos_mortos', 0)
+        self.__total_inimigos = estatisticas.get('total_inimigos', 0)
+        self.__vida_restante = estatisticas.get('vida_restante', 0)
+        self.__vida_maxima = estatisticas.get('vida_maxima', 0)
+        
+        if tempo_jogo is not None and self.__nome_jogador:
+            self.adicionar_ao_ranking(self.__nome_jogador, tempo_jogo)
+
     def sair(self):
         """Sai do jogo"""
         self.running = False
@@ -475,6 +506,38 @@ class MenuModerno:
         for i, botao in enumerate(self.__botoes):
             self.desenhar_botao(botao, i, mouse_pos)
 
+    def desenhar_vitoria(self, mouse_pos):
+        """Desenha a tela de vitória"""
+        titulo = self.__fonte_titulo.render("VITÓRIA!", True, self.__cor_primaria)
+        titulo_rect = titulo.get_rect(center=(self.__largura // 2, 150))
+        self.__screen.blit(titulo, titulo_rect)
+
+        # Mensagem personalizada
+        if self.__nome_jogador:
+            msg = self.__fonte_subtitulo.render(
+                f"Parabéns, {self.__nome_jogador}!", True, self.__cor_texto
+            )
+            msg_rect = msg.get_rect(center=(self.__largura // 2, 200))
+            self.__screen.blit(msg, msg_rect)
+
+        # Desenha estatísticas
+        y_pos = 250
+        estatisticas_texto = [
+            "Tempo de jogo: %d:%02d" % (self.__tempo_jogo // 60, self.__tempo_jogo % 60),
+            f"Inimigos derrotados: {self.__inimigos_mortos}/{self.__total_inimigos}",
+            f"Vida restante: {self.__vida_restante}/{self.__vida_maxima}"
+        ]
+
+        for texto in estatisticas_texto:
+            stat = self.__fonte_texto.render(texto, True, self.__cor_texto_secundario)
+            stat_rect = stat.get_rect(center=(self.__largura // 2, y_pos))
+            self.__screen.blit(stat, stat_rect)
+            y_pos += 30
+
+        # Desenha botões
+        for i, botao in enumerate(self.__botoes):
+            self.desenhar_botao(botao, i, mouse_pos)
+
     def processar_input_teclado(self, event):
         """Processa input do teclado"""
         if event.type == pygame.KEYDOWN:
@@ -578,6 +641,8 @@ class MenuModerno:
                 self.desenhar_input_nome(mouse_pos)
             elif self.estado == "game_over":
                 self.desenhar_game_over(mouse_pos)
+            elif self.estado == "vitoria":
+                self.desenhar_vitoria(mouse_pos)
 
             pygame.display.flip()
             self.__clock.tick(60)

@@ -95,6 +95,18 @@ class Slime(Entidade):
         """Verifica se a animação de morte foi completada"""
         return self.__estado == 'morto' and self.__tempo_animacao_morte >= self.__duracao_animacao_morte
     
+    def reset(self):
+        """Reseta o slime para estado inicial para reuso na pool"""
+        self.__vida = self.__vida_maxima
+        self.__estado = 'patrulhando'
+        self.__direcao = random.choice([-1, 1])
+        self.__tempo_ataque = 0
+        self.__tempo_patrulha = 0
+        self.__iframes = 0
+        self.__tempo_animacao_morte = 0
+        for animacao in self.__assets.values():
+            animacao.reset()
+    
     def receber_dano(self, dano):
         """Aplica dano ao slime"""
         if self.__iframes <= 0 and self.__estado != 'morto':
