@@ -12,6 +12,8 @@ class TileMap:
         self.__offgrid_tiles = []
         self.__NEIGHBOR_OFFSET = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (1, 1), (0, 1), (-1, 1)]
         self.__FISICA_ATIVADA = {'grass', 'stone'}
+        self.__mapa_min_y = 0
+        self.__limite_mapa_y = 1000  # Limite inicial do mapa
         
         # Carregando os assets do tilemap
         self.__assets = {
@@ -67,6 +69,22 @@ class TileMap:
     @FISICA_ATIVADA.setter
     def FISICA_ATIVADA(self, value):
         self.__FISICA_ATIVADA = value
+        
+    @property
+    def mapa_min_y(self):
+        return self.__mapa_min_y
+    
+    @mapa_min_y.setter
+    def mapa_min_y(self, value):
+        self.__mapa_min_y = value
+        
+    @property
+    def limite_mapa_y(self):
+        return self.__limite_mapa_y
+    
+    @limite_mapa_y.setter
+    def limite_mapa_y(self, value):
+        self.__limite_mapa_y = value
 
     # Método para pegar os tiles ao redor de uma posição
     def tiles_around(self, pos):
@@ -88,6 +106,8 @@ class TileMap:
             self.__tilemap = data['tilemap']
             self.__tile_size = data['tile_size']
             self.__offgrid_tiles = data['offgrid']
+            
+        self.__calcular_limite_mapa()
 
     # Método para pegar os retângulos ao redor de uma posição
     def fisica_rect_around(self, pos):
@@ -113,29 +133,46 @@ class TileMap:
                               tile['pos'][1] * self.__tile_size - offset[1]))
 
 
-    def procurar_objeto(self, tipo, variant, remover=False):
-        """
-        Procura o primeiro objeto do tipo e variante especificados no tilemap.
-        Retorna a posição (x, y) do objeto encontrado.
-        Se remover=True, remove o objeto do tilemap.
-        """
-        # Procura nos tiles do grid
-        for loc, tile in list(self.__tilemap.items()):
-            if tile['type'] == tipo and tile['variant'] == variant:
-                pos = (tile['pos'][0], tile['pos'][1])
-                if remover:
-                    del self.__tilemap[loc]
-                return pos
+    def procurar_objeto(self, id_pair, keep=False):
+        
+        matches = []
+        # Procura nos tiles offgrid
+        for tile in self.offgrid_tiles:
+            if (tile['type'], tile['variant']) in id_pair:
+                matches.append(tile.copy())
+                if not keep:
+                    self.offgrid_tiles.remove(tile)
+        
+        # Procura nos tiles do tilemap
+        for loc in self.tilemap:
+            matches.append(tile.copy())
+            matches[-1]['pos'] = matches[-1]['pos'].copy()  # Faz uma cópia da posição]
+            matches[-1]['pos'][0] *= self.tile_size
+            matches[-1]['pos'][1] *= self.tile_size
+            
+            if not keep:
+                del self.tilemap[loc]
+        
 
-        # Procura nos offgrid_tiles
-        for i, tile in enumerate(self.__offgrid_tiles):
-            if tile['type'] == tipo and tile['variant'] == variant:
-                pos = (tile['pos'][0], tile['pos'][1])
-                if remover:
-                    self.__offgrid_tiles.pop(i)
-                return pos
+        return matches
+    
+    def __calcular_limite_mapa(self):
+        if self and hasattr(self, "tilemap"):
+            max_y = 0
+            for pos_str in self.tilemap:
+                if isinstance(pos_str, str):
+                    pos_clean = pos_str.strip("()")
+                    coords = pos_clean.split(";" if ";" in pos_clean else ", ")
+                    pos = (int(coords[0]), int(coords[1]))
+                else:
+                    pos = pos_str
 
-        return None  # Não encontrado
+                if pos[1] > max_y:
+                    max_y = pos[1]
+            self.mapa_min_y = (max_y + 1) * self.tile_size
+            self.limite_mapa_y = self.mapa_min_y + 500
+        else:
+            self.limite_mapa_y = 1000
                     
         
 

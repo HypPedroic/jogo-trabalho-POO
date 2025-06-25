@@ -1,7 +1,7 @@
 # Importando as bibliotecas necessárias
 import pygame
 import random
-from .slime import Slime
+from entidades.slime import Slime
 
 class SpawnManager:
     def __init__(self, tilemap, player, num_inimigos=15):
@@ -207,7 +207,7 @@ class SpawnManager:
     def renderizar(self, surf, offset=(0, 0)):
         """Renderiza todos os inimigos"""
         for inimigo in self.__inimigos_ativos:
-            inimigo.render(surf, offset)
+            inimigo.renderizar(surf, offset)
     
     def render(self, surf, offset=(0, 0)):
         """Alias para renderizar - compatibilidade com o jogo"""

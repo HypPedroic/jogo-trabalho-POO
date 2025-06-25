@@ -12,7 +12,7 @@ class Entidade:
         self.__velocidade = [0, 0]
         self.__colisoes = {'cima': False, 'baixo': False, 'esquerda': False, 'direita': False}
         self.__action = ''
-        self.__anim_offeset = (-8, 0)
+        self.__anim_offeset = [0, 0]
         self.__flip = False
         self.__movimento = [False, False]  # [direita, esquerda]
         
@@ -150,7 +150,7 @@ class Entidade:
         movimento_x = self.__movimento[0] - self.__movimento[1]
         frame_movement = (movimento_x + self.__velocidade[0])
 
-        self.__pos[0] += frame_movement * 3
+        self.__pos[0] += frame_movement * 2
         # Verifica se a entidade está colidindo com algum retângulo de colisão para o eixo X
         self.__colisao_X(tilemap, frame_movement)
             

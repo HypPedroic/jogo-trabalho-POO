@@ -1,10 +1,11 @@
 import pygame
 from entidades.player import Player
-from entidades.spawn_manager import SpawnManager
+from .spawn_manager import SpawnManager
 from tilemap.tile_map import TileMap
 from background.background import Background
 from ui.game_interface import GameInterface
 from menu.menu import Menu
+from particles.particles import Particle
 import random
 
 class GameManager:
@@ -28,13 +29,10 @@ class GameManager:
         self.__game_interface = None
         self.__spawn_manager = None
 
-        # Sistema de limbo
-        self.__limite_mapa_y = 1000
-        self.__mapa_min_y = 0
-
         # Listas de entidades
         self.projeteis = []
         self.inimigos = []
+        self.particulas = []
 
         # Sistema de áudio
         self.__carregar_sistema_audio()
@@ -119,7 +117,6 @@ class GameManager:
 
         try:
             self.__tilemap.load("data/mapas/map.json")
-            self.__calcular_limite_mapa()
         except FileNotFoundError:
             print("Mapa não encontrado, usando configuração padrão")
 
@@ -132,28 +129,8 @@ class GameManager:
         self.__spawn_manager.game = self
         self.__spawn_manager.spawn_todos_inimigos()
         self.__tocar_musica_aleatoria()
+        
 
-    def __calcular_limite_mapa(self):
-        if self.__tilemap and hasattr(self.__tilemap, "tilemap"):
-            max_y = 0
-            for pos_str in self.__tilemap.tilemap:
-                if isinstance(pos_str, str):
-                    pos_clean = pos_str.strip("()")
-                    coords = pos_clean.split(";" if ";" in pos_clean else ", ")
-                    pos = (int(coords[0]), int(coords[1]))
-                else:
-                    pos = pos_str
-
-                if pos[1] > max_y:
-                    max_y = pos[1]
-            self.__mapa_min_y = (max_y + 1) * self.__tilemap.tile_size
-            self.__limite_mapa_y = self.__mapa_min_y + 500
-        else:
-            self.__limite_mapa_y = 1000
-
-    def __verificar_limbo(self):
-        if self.__player and self.__player.retangulo().y > self.__limite_mapa_y:
-            self.__player_morreu()
 
     def __player_morreu(self):
         tempo_jogo = None
@@ -190,6 +167,7 @@ class GameManager:
             self.__update_jogo()
 
     def __update_jogo(self):
+        
         if not all([self.__player, self.__tilemap, self.__background, self.__game_interface]):
             return
 
@@ -212,7 +190,7 @@ class GameManager:
             self.__spawn_manager.verificar_colisoes_projeteis(self.projeteis)
 
         self.__atualizar_projeteis(camera_movement)
-        self.__verificar_limbo()
+        self.__atualizar_Particulas(camera_movement)
         self.__verificar_estado_jogo()
 
         self.__game_interface.render(self.__display)
@@ -236,9 +214,16 @@ class GameManager:
     def __atualizar_projeteis(self, camera_movement):
         for projetil in self.projeteis:
             projetil.update(self, self.__tilemap)
-            projetil.renderizar(self.__display, offset=camera_movement)
+            projetil.renderizar(self.display, offset=camera_movement)
             if projetil.vida <= 0:
                 self.projeteis.remove(projetil)
+                
+    def __atualizar_Particulas(self, camera_movement):
+        for particula in self.particulas.copy():
+            kill = particula.update()
+            particula.render(self.display, offset=camera_movement)
+            if kill:
+                self.particulas.remove(particula)
 
     def __verificar_estado_jogo(self):
         if self.__player.vida <= 0:

@@ -19,6 +19,8 @@ class Slime(Entidade):
         # Chamando o construtor da classe pai
         super().__init__(self.__assets, pos, tamanho)
         
+        self.anim_offeset = [0, -8]  # Offset da animação para alinhar com o sprite
+        
         # Atributos específicos do slime
         self.__vida = 2  # Slime morre com 2 hits
         self.__vida_maxima = 2
@@ -255,23 +257,10 @@ class Slime(Entidade):
         super().update(tilemap)
         return True
     
-    def get_current_sprite(self):
-        """Retorna a sprite atual da animação"""
-        return self.animation.img()
 
-    def render(self, surf, offset=(0, 0)):
-        """Renderiza o slime"""
-        if self.__estado == 'morto' and self.__tempo_animacao_morte >= self.__duracao_animacao_morte:
-            return  # Não renderiza se a animação de morte terminou
+    def renderizar(self, surf, offset=...):
+        if self.__iframes > 0 and (self.__iframes // 3) % 2 == 0:
+            return  # Não desenha neste frame (efeito de piscar)
+        super().renderizar(surf, offset)
         
-        # Efeito de piscar durante iframes com transparência ao invés de não renderizar
-        alpha = 255
-        if self.__iframes > 0:
-            alpha = 128 if self.__iframes % 4 < 2 else 255
         
-        # Renderiza com transparência
-        sprite = self.get_current_sprite().copy()
-        if self.flip:
-            sprite = pygame.transform.flip(sprite, True, False)
-        sprite.set_alpha(alpha)
-        surf.blit(sprite, (self.pos[0] - offset[0], self.pos[1] - offset[1]))
