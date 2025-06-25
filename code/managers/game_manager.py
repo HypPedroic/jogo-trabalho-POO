@@ -109,28 +109,34 @@ class GameManager:
         self.__estado = "jogando"
 
     def __inicializar_componentes_jogo(self):
-        self.__player = Player((0, 0), (20, 32))
+        self.__player = Player([0, 0], (20, 32))
         self.__tilemap = TileMap(32)
         self.__background = Background(self.__screen.get_height())
         self.__game_interface = GameInterface(self)
         self.__game_interface.reset_timer()
 
-        try:
-            self.__tilemap.load("data/mapas/map.json")
-        except FileNotFoundError:
-            print("Mapa não encontrado, usando configuração padrão")
+        self.__tilemap.load("data/mapas/map.json")
+            
+        for spawner in self.__tilemap.procurar_objeto([('Spawners', 0)]):
+
+            print(spawner["pos"])
+            if spawner['variant'] == 0:
+                self.__player.pos = spawner['pos']
+
 
         try:
             self.__background = Background.load("data/backgrounds/default.json")
         except FileNotFoundError:
             pass
+        
+        
 
         self.__spawn_manager = SpawnManager(self.__tilemap, self.__player, self.__num_inimigos)
         self.__spawn_manager.game = self
         self.__spawn_manager.spawn_todos_inimigos()
         self.__tocar_musica_aleatoria()
-        
 
+        
 
     def __player_morreu(self):
         tempo_jogo = None

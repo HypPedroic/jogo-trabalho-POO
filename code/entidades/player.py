@@ -196,7 +196,7 @@ class Player(Entidade):
         
     def receber_dano(self, dano=1, game=None):
         """Player recebe dano de inimigos"""
-        if self.iframe_timer == 0 and self.dashing <= 40:  # Só recebe dano se não estiver em iframes
+        if self.iframe_timer == 0 and abs(self.dashing) <= 40:  # Só recebe dano se não estiver em iframes
             self.vida -= dano
             # iFrames duram 60 frames (1 segundo a 60fps)
             self.iframe_timer = 60

@@ -133,25 +133,26 @@ class TileMap:
                               tile['pos'][1] * self.__tile_size - offset[1]))
 
 
-    def procurar_objeto(self, id_pair, keep=False):
+    def procurar_objeto(self, id_pairs, keep=False):
         
         matches = []
         # Procura nos tiles offgrid
         for tile in self.offgrid_tiles:
-            if (tile['type'], tile['variant']) in id_pair:
+            if (tile['type'], tile['variant']) in id_pairs:
                 matches.append(tile.copy())
                 if not keep:
                     self.offgrid_tiles.remove(tile)
         
         # Procura nos tiles do tilemap
-        for loc in self.tilemap:
-            matches.append(tile.copy())
-            matches[-1]['pos'] = matches[-1]['pos'].copy()  # Faz uma cópia da posição]
-            matches[-1]['pos'][0] *= self.tile_size
-            matches[-1]['pos'][1] *= self.tile_size
-            
-            if not keep:
-                del self.tilemap[loc]
+        for loc in list(self.tilemap.keys()):  # <-- Faz uma cópia das chaves
+            tile = self.tilemap[loc]
+            if (tile['type'], tile['variant']) in id_pairs:
+                matches.append(tile.copy())
+                matches[-1]['pos'] = matches[-1]['pos'].copy()
+                matches[-1]['pos'][0] *= self.tile_size
+                matches[-1]['pos'][1] *= self.tile_size
+                if not keep:
+                    del self.tilemap[loc]
         
 
         return matches
