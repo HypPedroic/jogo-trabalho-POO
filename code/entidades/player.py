@@ -27,7 +27,7 @@ class Player(Entidade):
         self.__vidaMax = 3
         self.__vida = self.__vidaMax
         self.__estado = 'normal'
-        self.__furia = 100
+        self.__furia = 0
         self.__pulos_disponiveis = 2
         self.__iframe_timer = 0
         self.__air_time = 0
@@ -111,6 +111,20 @@ class Player(Entidade):
         
         self.verificar_limbo(tilemap)
         
+        if self.atacando > 0:
+            self.__atacando -= 1
+            if self.__atacando == 56:
+                self.__ataque_normal(game)
+            if self.__atacando <= 0:
+                self.atacando = 0
+        
+        if self.estado == 'foice':
+            self.furia -= 0.1
+            if self.furia <= 0:
+                self.furia = 0
+                self.estado = 'normal'
+                self.anim_offeset = [-8, 0]
+        
         # Atualiza iframes
         if self.iframe_timer > 0:
             self.__iframe_timer -= 1
@@ -157,17 +171,19 @@ class Player(Entidade):
             self.__air_time = 5
 
     def ativar_furia(self, game=None):
-        if self.__furia == 100:
-            self.__estado = 'foice'
+        if self.furia == 100:
+            self.estado = 'foice'
             # Toca som de fúria
             self.anim_offeset = [-8, -16]
+            self.vida = self.vidaMax
             if game:
                 game.tocar_som('furia')
 
     def atacar(self):
-        if self.__estado == 'normal':
-            self.__atacando = 64
-        elif self.__estado == 'foice':
+        if self.estado == 'normal':
+            if not self.atacando:
+                self.atacando = 96
+        elif self.estado == 'foice':
             if not self.dashing:
                 if self.flip:
                     self.dashing = -60
@@ -213,10 +229,8 @@ class Player(Entidade):
 
     def __animacao_atual(self, game):
         if self.__atacando > 0:
-            self.set_action('attack')
-            self.__atacando -= 1
-            if self.__atacando == 24:
-                self.__ataque_normal(game)
+            if self.__atacando > 32:
+                self.set_action('attack')
         elif self.__air_time > 4:
             if self.__estado == 'normal':
                 self.set_action('jump')

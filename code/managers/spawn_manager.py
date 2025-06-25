@@ -180,12 +180,14 @@ class SpawnManager:
             
             # Verifica colisão com o player
             if inimigo.estado != 'morto' and self.__verificar_colisao_player(inimigo):
-                if inimigo.pode_atacar_jogador():
+                if inimigo.pode_atacar_jogador() and self.__player.dashing == 0:
                     # Passa referência do game para o ataque
                     if hasattr(self, '_SpawnManager__game'):
                         inimigo.atacar_jogador(self.__game)
                     else:
                         inimigo.atacar_jogador()
+                else:
+                    inimigo.receber_dano(3)
             
             # Verifica se o inimigo caiu no limbo
             if inimigo.retangulo().y > self.__limite_limbo_y and inimigo.estado != 'morto':
@@ -231,6 +233,9 @@ class SpawnManager:
                         # Aplica 1 de dano ao inimigo (slime morre com 2 tiros)
                         vida_antes = inimigo.vida
                         inimigo.receber_dano(1)
+                        
+                        if self.__player.furia < 100:
+                            self.__player.furia += 25
                         
                         # Se o inimigo morreu, toca som
                         if vida_antes > 0 and inimigo.vida <= 0:
