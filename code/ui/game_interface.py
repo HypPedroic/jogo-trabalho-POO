@@ -136,12 +136,8 @@ class GameInterface:
         pygame.draw.rect(surface, (255, 255, 255), background_rect, 2)
 
         # Calcula o nível de fúria baseado no estado do player
-        fury_level = 0.0
-        if hasattr(self.__game.player, "estado"):
-            if self.__game.player.estado == "foice":
-                fury_level = 1.0  # Fúria máxima quando em estado foice
-            else:
-                fury_level = 0.0  # Sem fúria quando não está usando a foice
+        fury_level = self.game.player.furia/100
+            
 
         # Desenha a barra de fúria - sempre vermelha quando ativa
         if fury_level > 0:
