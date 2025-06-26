@@ -2,9 +2,10 @@
 import pygame
 import random
 from entidades.slime import Slime
+from entidades.esqueleto import Esqueleto
 
 class SpawnManager:
-    def __init__(self, tilemap, player, num_inimigos=15):
+    def __init__(self, tilemap, player, num_inimigos=15, game=None):
         self.__tilemap = tilemap
         self.__player = player
         self.__inimigos_ativos = []
@@ -15,7 +16,7 @@ class SpawnManager:
         self.__posicoes_spawn = []
         self.__ultimo_spawn = 0
         self.__intervalo_spawn = 5000  # 5 segundos
-        self.__game = None  # Referência para o jogo (para sons)
+        self.__game = game  # Referência para o jogo (para sons e projéteis)
         
         # Sistema de limbo - inimigos morrem se caírem muito baixo
         self.__limite_limbo_y = 1000  # Distância abaixo do mapa onde inimigos morrem
@@ -105,9 +106,13 @@ class SpawnManager:
     
     def __inicializar_pool(self):
         """Inicializa a pool de inimigos"""
-        for _ in range(self.__max_inimigos):
-            slime = Slime((0, 0), (16, 16))  # Posição inicial não importa
-            self.__inimigos_pool.append(slime)
+        for i in range(self.__max_inimigos):
+            if i % 2 == 0:
+                slime = Slime((0, 0), (16, 16))  # Posição inicial não importa
+                self.__inimigos_pool.append(slime)
+            else:
+                esqueleto = Esqueleto(self.__game, 0, 0, (16, 32))
+                self.__inimigos_pool.append(esqueleto)
     
     def __obter_inimigo_da_pool(self):
         """Obtém um inimigo da pool ou cria um novo se necessário"""
