@@ -195,3 +195,12 @@ class GameInterface:
     def reset_timer(self):
         """Reseta o timer do jogo"""
         self.__start_time = pygame.time.get_ticks()
+
+    def get_tempo(self):
+        # Retorna o tempo de jogo em segundos
+        tempo_atual = pygame.time.get_ticks()
+        return (tempo_atual - self.__start_time) // 1000
+
+    def set_tempo(self, tempo):
+        # Define o tempo inicial para restaurar o tempo salvo
+        self.__start_time = pygame.time.get_ticks() - tempo * 1000

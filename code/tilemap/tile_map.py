@@ -175,8 +175,3 @@ class TileMap:
         else:
             self.limite_mapa_y = 1000
                     
-        
-
-        
-
-       

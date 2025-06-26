@@ -131,9 +131,18 @@ class Menu:
         self.__ranking_data = self.__ranking_data[:10]
         self.salvar_ranking()
 
+    def existe_save(self):
+        return os.path.exists("data/save.json")
+
     def criar_botoes_menu_principal(self):
-        """Cria os botões do menu principal"""
-        self.__botoes = [
+        self.__botoes = []
+        if self.existe_save():
+            self.__botoes.append({
+                "texto": "CONTINUAR PARTIDA",
+                "acao": self.continuar_partida,
+                "rect": pygame.Rect(self.__largura // 2 - 100, 210, 200, 50),
+            })
+        self.__botoes.extend([
             {
                 "texto": "JOGAR",
                 "acao": self.ir_para_input_nome,
@@ -149,7 +158,7 @@ class Menu:
                 "acao": self.sair,
                 "rect": pygame.Rect(self.__largura // 2 - 100, 420, 200, 50),
             },
-        ]
+        ])
 
     def criar_botoes_ranking(self):
         """Cria os botões da tela de ranking"""
@@ -222,7 +231,11 @@ class Menu:
     def confirmar_nome(self):
         """Confirma o nome do jogador e inicia o jogo"""
         if self.__nome_jogador.strip():
-            return True
+            return {
+                "nome": self.__nome_jogador.strip(),
+                "dificuldade": self.__dificuldade_atual,
+                "num_inimigos": self.__inimigos_por_dificuldade[self.__dificuldade_atual]
+            }
         return False
 
     def reiniciar_jogo(self):
@@ -277,6 +290,9 @@ class Menu:
     def sair(self):
         """Sai do jogo"""
         self.running = False
+
+    def continuar_partida(self):
+        return "continuar"
 
     def desenhar_fundo_gradiente(self):
         """Desenha um fundo com gradiente"""
@@ -556,27 +572,22 @@ class Menu:
             else:
                 if self.estado == "menu_principal":
                     if event.key == pygame.K_LEFT:
-                        # Muda para a dificuldade anterior
                         atual_index = self.__dificuldades.index(self.__dificuldade_atual)
                         self.__dificuldade_atual = self.__dificuldades[(atual_index - 1) % len(self.__dificuldades)]
                     elif event.key == pygame.K_RIGHT:
-                        # Muda para a próxima dificuldade
                         atual_index = self.__dificuldades.index(self.__dificuldade_atual)
                         self.__dificuldade_atual = self.__dificuldades[(atual_index + 1) % len(self.__dificuldades)]
-                
                 if event.key == pygame.K_UP:
-                    self.__botao_selecionado = (self.__botao_selecionado - 1) % len(
-                        self.__botoes
-                    )
+                    self.__botao_selecionado = (self.__botao_selecionado - 1) % len(self.__botoes)
                 elif event.key == pygame.K_DOWN:
-                    self.__botao_selecionado = (self.__botao_selecionado + 1) % len(
-                        self.__botoes
-                    )
+                    self.__botao_selecionado = (self.__botao_selecionado + 1) % len(self.__botoes)
                 elif event.key == pygame.K_RETURN:
                     if self.__botoes:
                         botao = self.__botoes[self.__botao_selecionado]
                         if botao["acao"]:
                             resultado = botao["acao"]()
+                            if botao["texto"] == "CONTINUAR PARTIDA":
+                                return "continuar"
                             if resultado and self.estado == "input_nome" and self.__nome_jogador.strip() and botao["texto"] == "CONFIRMAR":
                                 return {
                                     "nome": self.__nome_jogador.strip(),
@@ -591,12 +602,13 @@ class Menu:
             if self.estado == "input_nome":
                 input_rect = pygame.Rect(self.__largura // 2 - 150, 300, 300, 50)
                 self.__input_ativo = input_rect.collidepoint(mouse_pos)
-
             for i, botao in enumerate(self.__botoes):
                 if botao["rect"].collidepoint(mouse_pos):
                     self.__botao_selecionado = i
                     if botao["acao"]:
                         resultado = botao["acao"]()
+                        if botao["texto"] == "CONTINUAR PARTIDA":
+                            return "continuar"
                         if resultado and self.estado == "input_nome" and self.__nome_jogador.strip() and botao["texto"] == "CONFIRMAR":
                             return {
                                 "nome": self.__nome_jogador.strip(),

@@ -2,6 +2,8 @@ import pygame
 import sys
 from managers.game_manager import GameManager
 from managers.state_manager import GameState
+import os
+import json
 
 class Jogo:
     def __init__(self):
@@ -30,8 +32,20 @@ class Jogo:
                     nome = self.__game_manager.menu.run()
                     print(f"Menu retornou: {nome}")
                     
-                    if nome:  # Se retornou um nome, inicia o jogo
+                    if nome == "continuar":
+                        print("Carregando progresso salvo...")
+                        self.__game_manager.iniciar_jogo_carregado()
+                    elif isinstance(nome, dict):  # Se retornou um dicionário, inicia o jogo normalmente
                         print(f"Iniciando jogo com jogador: {nome}")
+                        try:
+                            save_path = "data/save.json"
+                            if os.path.exists(save_path):
+                                with open(save_path, "r", encoding="utf-8") as f:
+                                    progresso = json.load(f)
+                                if progresso.get("nome") == nome["nome"]:
+                                    os.remove(save_path)
+                        except Exception:
+                            pass
                         self.__game_manager.iniciar_jogo(nome)
                     elif not self.__game_manager.menu.running:  # Se o menu foi fechado
                         print("Menu foi fechado, encerrando jogo")
