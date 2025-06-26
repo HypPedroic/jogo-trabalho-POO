@@ -2,7 +2,6 @@
 import pygame
 
 
-
 # Classe da entidade física
 class Entidade:
     def __init__(self, assets, pos, tamanho):
