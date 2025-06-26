@@ -89,6 +89,10 @@ class GameManager:
     @property
     def projeteis(self):
         return self.__projeteis
+    
+    @projeteis.setter
+    def projeteis(self, value):
+        self.__projeteis = value
 
     @property
     def inimigos(self):
@@ -97,6 +101,14 @@ class GameManager:
     @property
     def particulas(self):
         return self.__particulas
+    
+    @property
+    def display(self):
+        return self.__display
+    
+    @display.setter
+    def display(self, value):
+        self.__display = value
 
     def tocar_som(self, nome_som):
         if nome_som in self.__sons:
@@ -145,8 +157,7 @@ class GameManager:
         
         
 
-        self.__spawn_manager = SpawnManager(self.__tilemap, self.__player, self.__num_inimigos)
-        self.__spawn_manager.game = self
+        self.__spawn_manager = SpawnManager(self.__tilemap, self.__player, self.__num_inimigos, game=self)
         self.__spawn_manager.spawn_todos_inimigos()
         self.__tocar_musica_aleatoria()
 
@@ -304,7 +315,7 @@ class GameManager:
             except Exception:
                 pass
 
-    def __iniciar_jogo_carregado(self):
+    def iniciar_jogo_carregado(self):
         progresso = self.__carregar_progresso()
         if not progresso:
             return

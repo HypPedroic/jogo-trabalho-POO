@@ -174,4 +174,10 @@ class TileMap:
             self.limite_mapa_y = self.mapa_min_y + 500
         else:
             self.limite_mapa_y = 1000
+            
+    def solid_check(self, pos):
+        tile_loc = str(int(pos[0] // self.tile_size)) + ';' + str(int(pos[1] // self.tile_size))
+        if tile_loc in self.tilemap:
+            if self.tilemap[tile_loc]['type'] in self.FISICA_ATIVADA:
+                return self.tilemap[tile_loc]
                     

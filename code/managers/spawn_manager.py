@@ -2,7 +2,7 @@
 import pygame
 import random
 from entidades.slime import Slime
-from entidades.esqueleto import Esqueleto
+from entidades.isqueleto import Isqueleto
 
 class SpawnManager:
     def __init__(self, tilemap, player, num_inimigos=15, game=None):
@@ -107,12 +107,13 @@ class SpawnManager:
     def __inicializar_pool(self):
         """Inicializa a pool de inimigos"""
         for i in range(self.__max_inimigos):
-            if i % 2 == 0:
-                slime = Slime((0, 0), (16, 16))  # Posição inicial não importa
+            if random.choice([True, False]):
+                slime = Slime((0, 0), (16, 16))
                 self.__inimigos_pool.append(slime)
             else:
-                esqueleto = Esqueleto(self.__game, 0, 0, (16, 32))
+                esqueleto = Isqueleto((0, 0), (32, 32), game=self.__game) 
                 self.__inimigos_pool.append(esqueleto)
+
     
     def __obter_inimigo_da_pool(self):
         """Obtém um inimigo da pool ou cria um novo se necessário"""
@@ -185,13 +186,13 @@ class SpawnManager:
             
             # Verifica colisão com o player
             if inimigo.estado != 'morto' and self.__verificar_colisao_player(inimigo):
-                if inimigo.pode_atacar_jogador() and self.__player.dashing == 0:
+                if inimigo.pode_atacar_jogador_colisao() and self.__player.dashing == 0:
                     # Passa referência do game para o ataque
                     if hasattr(self, '_SpawnManager__game'):
                         inimigo.atacar_jogador(self.__game)
                     else:
                         inimigo.atacar_jogador()
-                else:
+                elif abs(self.__player.dashing) > 40 and inimigo.estado != 'inativo':
                     inimigo.receber_dano(3)
             
             # Verifica se o inimigo caiu no limbo
@@ -208,6 +209,7 @@ class SpawnManager:
                 self.__retornar_inimigo_para_pool(inimigo)
                 self.__inimigos_mortos += 1
                 print(f"Inimigo morto! Restam {self.get_inimigos_vivos()} inimigos.")
+                
         
         # Não spawna novos inimigos - quantidade fixa
     
@@ -223,34 +225,52 @@ class SpawnManager:
     def verificar_colisao_projeteis(self, projeteis):
         """Verifica colisão entre projéteis e inimigos"""
         for projetil in projeteis[:]:
-            for inimigo in self.__inimigos_ativos[:]:
-                if inimigo.estado != 'morto':
-                    # Verifica colisão com hitbox mais precisa
-                    projetil_rect = pygame.Rect(projetil.pos[0] + 8, projetil.pos[1] + 8, 16, 16)
-                    inimigo_rect = pygame.Rect(inimigo.pos[0], inimigo.pos[1], 
-                                             inimigo.tamanho[0], inimigo.tamanho[1])
-                    
-                    if projetil_rect.colliderect(inimigo_rect):
-                        # Remove projétil
-                        if projetil in projeteis:
-                            projeteis.remove(projetil)
+            if projetil.tipo == 'projetil':
+                for inimigo in self.__inimigos_ativos[:]:
+                    if inimigo.estado != 'morto' and projetil.tipo == 'projetil' :
+                        # Verifica colisão com hitbox mais precisa
+                        projetil_rect = pygame.Rect(projetil.pos[0] + 8, projetil.pos[1] + 8, 16, 16)
+                        inimigo_rect = pygame.Rect(inimigo.pos[0], inimigo.pos[1], 
+                                                inimigo.tamanho[0], inimigo.tamanho[1])
                         
-                        # Aplica 1 de dano ao inimigo (slime morre com 2 tiros)
-                        vida_antes = inimigo.vida
-                        inimigo.receber_dano(1)
-                        
-                        if self.__player.furia < 100:
-                            self.__player.furia += 25
-                        
-                        # Se o inimigo morreu, toca som
-                        if vida_antes > 0 and inimigo.vida <= 0:
-                            if hasattr(self, '_SpawnManager__game') and self.__game:
-                                self.__game.tocar_som('matando_inimigo')
-                            print(f"Slime morto por projétil!")
-                        else:
-                            print(f"Slime atingido! Vida restante: {inimigo.vida}")
-                        
-                        break  # Sai do loop de inimigos para este projétil
+                        if projetil_rect.colliderect(inimigo_rect) and inimigo.estado != 'inativo':
+                            # Remove projétil
+                            if projetil in projeteis:
+                                projeteis.remove(projetil)
+                            
+                            # Aplica 1 de dano ao inimigo (slime morre com 2 tiros)
+                            vida_antes = inimigo.vida
+                            inimigo.receber_dano(1)
+                            
+                            if self.__player.furia < 100:
+                                self.__player.furia += 25
+                            
+                            # Se o inimigo morreu, toca som
+                            if vida_antes > 0 and inimigo.vida <= 0:
+                                if hasattr(self, '_SpawnManager__game') and self.__game:
+                                    self.__game.tocar_som('matando_inimigo')
+                                print(f"Slime morto por projétil!")
+                            else:
+                                print(f"Slime atingido! Vida restante: {inimigo.vida}")
+                            
+                            break  # Sai do loop de inimigos para este projétil
+            elif projetil.tipo == 'osso':
+                player_rect = self.__player.retangulo()
+                projetil_rect = pygame.Rect(projetil.pos[0] + 8, projetil.pos[1] + 8, 16, 16)
+                if projetil_rect.colliderect(player_rect):
+                    # Remove o projétil
+                    if projetil in projeteis:
+                        projeteis.remove(projetil)
+                    # Aplica dano ao jogador
+                    if hasattr(self.__player, 'receber_dano'):
+                        self.__player.receber_dano(1, self.__game)
+                    # Opcional: tocar som ou efeito
+                    if self.__game:
+                        self.__game.tocar_som('dano_jogador')
+                    print("Jogador atingido por projétil de esqueleto!")
+                   
+
+        
     
     def verificar_colisoes_projeteis(self, projeteis):
         """Alias para verificar_colisao_projeteis - compatibilidade com o jogo"""

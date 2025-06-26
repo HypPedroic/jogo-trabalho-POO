@@ -3,7 +3,7 @@ import math
 import random
 from entidades.entidade import Entidade
 from utils.utils import load_images
-from utils.animation import Animation
+from animation.animation import Animation
 from projeteis.projeteis import Projetil
 from particles.particles import Particle
 
