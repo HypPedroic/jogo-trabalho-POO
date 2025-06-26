@@ -1,7 +1,8 @@
 import pygame
 import time
 
-from code.entidades.entidade import Entidade
+from .projeteis import Projetil
+from .entidade import Entidade
 from utils.utils import load_images
 from utils.animation import Animation
 
@@ -23,10 +24,16 @@ class Esqueleto(Entidade):
         self.velocidade_inimigo = 1
         self.cooldown_tiro = 2.0  # segundos
         self.ultimo_tiro = time.time()
+        self.estado = 'vivo'  # novo atributo para controle de estado
+        self.animacao_morte_completa = False  # novo atributo para controle de animação de morte
 
     def update(self, tilemap, player):
         if self.morto:
             self.set_action('morrer')
+            self.estado = 'morto'
+            # Checa se a animação de morte terminou
+            if self.animation.terminou:
+                self.animacao_morte_completa = True
         elif self.atacando:
             self.set_action('ataque')
         else:
@@ -56,7 +63,7 @@ class Esqueleto(Entidade):
 
     def atirar_ossos(self, player):
         # Importa a classe Projetil
-        from code.projeteis.projeteis import Projetil
+        
         # Define a direção do tiro (direita ou esquerda)
         direcao = [False, False]
         if player.pos[0] < self.pos[0]:
@@ -75,14 +82,39 @@ class Esqueleto(Entidade):
         else:
             print('AVISO: game não possui lista_projeteis!')
 
+    def reset(self):
+        """Reseta o esqueleto para reutilização na pool"""
+        self.vida = 3
+        self.atacando = False
+        self.morto = False
+        self.estado = 'vivo'
+        self.animacao_morte_completa = False
+        self.set_action('idle')
+        self.pos = [0, 0]
+
+    def receber_dano(self, dano):
+        if not self.morto:
+            self.vida -= dano
+            if self.vida <= 0:
+                self.morrer()
+
+    def pode_atacar_jogador(self):
+        # Pode atacar se não estiver morto nem atacando
+        return not self.morto and not self.atacando
+
+    def atacar_jogador(self, game=None):
+        self.atacar(game.player if game and hasattr(game, 'player') else None)
+
     def atacar(self, player):
         if not self.morto and not self.atacando:
             self.atacando = True
-            # Aqui você pode adicionar lógica para causar dano ao player
-            player.vida -= self.dano
+            if player:
+                player.vida -= self.dano
 
     def morrer(self):
         self.morto = True
+        self.estado = 'morto'
+        self.set_action('morrer')
 
     def renderizar(self, surf, offset=(0, 0)):
         super().renderizar(surf, offset)
