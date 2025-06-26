@@ -1,0 +1,275 @@
+@startuml
+!theme plain
+
+' Classe principal do jogo
+class Jogo {
+  - largura: int
+  - altura: int
+  - screen: pygame.Surface
+  - clock: pygame.time.Clock
+  - game_manager: GameManager
+  + __init__()
+  + run()
+}
+
+' Gerenciador principal do jogo
+class GameManager {
+  - display: pygame.Surface
+  - clock: pygame.time.Clock
+  - estado: str
+  - menu: Menu
+  - player: Player
+  - tilemap: TileMap
+  - background: Background
+  - game_interface: GameInterface
+  - spawn_manager: SpawnManager
+  - projeteis: list
+  - inimigos: list
+  - particulas: list
+  - camera: list
+  - pausado: bool
+  - num_inimigos: int
+  + __init__(screen)
+  + iniciar_jogo()
+  + update()
+  + pausar_jogo()
+  + despausar_jogo()
+  + salvar_jogo()
+  + carregar_jogo()
+  + verificar_jogo_salvo(): bool
+}
+
+' Sistema de menu
+class Menu {
+  - screen: pygame.Surface
+  - largura: int
+  - altura: int
+  - clock: pygame.time.Clock
+  - running: bool
+  - estado: str
+  - dificuldades: list
+  - dificuldade_atual: str
+  - botoes: list
+  - botao_selecionado: int
+  - ranking_data: list
+  - nome_jogador: str
+  - input_ativo: bool
+  - tempo_animacao: int
+  - game_manager: GameManager
+  + __init__(screen, callback_iniciar_jogo)
+  + carregar_ranking()
+  + salvar_ranking()
+  + mostrar_menu_pausa()
+  + renderizar_menu_pausa()
+  + voltar_ao_jogo()
+  + salvar_jogo()
+  + carregar_jogo_salvo()
+}
+
+' Classe base para entidades
+class Entidade {
+  - assets: dict
+  - pos: list
+  - tamanho: tuple
+  - velocidade: list
+  - colisoes: dict
+  - action: str
+  - anim_offeset: list
+  - flip: bool
+  - movimento: list
+  + __init__(assets, pos, tamanho)
+  + update(tilemap)
+  + set_action(action)
+  + render(surf, offset)
+  + retangulo(): pygame.Rect
+}
+
+' Jogador
+class Player {
+  - vidaMax: int
+  - vida: int
+  - estado: str
+  - furia: int
+  - pulos_disponiveis: int
+  - iframe_timer: int
+  - air_time: int
+  - atacando: int
+  - dashing: int
+  + __init__(pos, tamanho)
+  + update(tilemap, game)
+  + atacar(): Projetil
+  + dash()
+  + pular()
+  + verificar_limbo(tilemap)
+}
+
+' Inimigo Slime
+class Slime {
+  - vida: int
+  - vida_maxima: int
+  - dano: int
+  - estado: str
+  - direcao: int
+  - velocidade_patrulha: float
+  - velocidade_perseguicao: float
+  - alcance_deteccao: int
+  - alcance_ataque: int
+  - tempo_ataque: int
+  - intervalo_ataque: int
+  - iframes: int
+  + __init__(pos, tamanho)
+  + update(tilemap, player)
+  + atacar_player(player)
+  + receber_dano(dano)
+}
+
+' Sistema de projéteis
+class Projetil {
+  - assets: dict
+  - pos: list
+  - tamanho: tuple
+  - action: str
+  - anim_offeset: tuple
+  - flip: bool
+  - movimento: list
+  - vidaMax: int
+  - vida: int
+  - duracao: int
+  - hit: bool
+  + __init__(pos, tamanho, movimento)
+  + update(game, tilemap)
+  + render(surf, offset)
+  + retangulo(): pygame.Rect
+}
+
+' Sistema de partículas
+class Particle {
+  + type: str
+  + pos: list
+  + velocity: list
+  + assets: dict
+  + animation: Animation
+  + __init__(p_type, pos, velocity, frame)
+  + update(): bool
+  + render(surf, offset)
+}
+
+' Sistema de animação
+class Animation {
+  - images: list
+  - img_duration: int
+  - loop: bool
+  - done: bool
+  - frame: int
+  - current_state: str
+  - state_transitions: dict
+  - on_complete_callback: function
+  + __init__(images, img_dur, loop)
+  + update()
+  + img(): pygame.Surface
+  + copy(): Animation
+}
+
+' Sistema de mapa
+class TileMap {
+  - tile_size: int
+  - tilemap: dict
+  - offgrid_tiles: list
+  - NEIGHBOR_OFFSET: list
+  - FISICA_ATIVADA: set
+  - mapa_min_y: int
+  - limite_mapa_y: int
+  - assets: dict
+  + __init__(tile_size)
+  + save(path)
+  + load(path)
+  + tiles_around(pos): list
+  + fisica_rect_around(pos): list
+  + renderizar(surf, offset)
+  + procurar_objeto(tipos): list
+}
+
+' Sistema de background
+class Background {
+  - screen_height: int
+  - layers: list
+  + __init__(screen_height)
+  + add_layer(image_path, scroll_speed)
+  + update(camera_pos)
+  + render(surface)
+  + save(filepath)
+  + load(filepath): Background
+}
+
+' Interface do jogo
+class GameInterface {
+  - game: GameManager
+  - images: dict
+  - hearts_start_x: int
+  - hearts_y: int
+  - heart_spacing: int
+  - jump_orb_x: int
+  - jump_orb_y: int
+  - fury_bar_x: int
+  - fury_bar_y: int
+  - fury_bar_width: int
+  - fury_bar_height: int
+  - start_time: int
+  - font: pygame.font.Font
+  - timer_color: tuple
+  + __init__(game)
+  + render(surface)
+  + reset_timer()
+  + get_tempo(): int
+  + set_tempo(tempo)
+}
+
+' Gerenciador de spawn
+class SpawnManager {
+  - tilemap: TileMap
+  - player: Player
+  - inimigos_ativos: list
+  - inimigos_pool: list
+  - max_inimigos: int
+  - inimigos_totais: int
+  - inimigos_mortos: int
+  - posicoes_spawn: list
+  - ultimo_spawn: int
+  - intervalo_spawn: int
+  - game: GameManager
+  - limite_limbo_y: int
+  + __init__(tilemap, player, num_inimigos)
+  + update()
+  + spawn_inimigo()
+  + remover_inimigo(inimigo)
+  + todos_inimigos_mortos(): bool
+}
+
+' Relacionamentos
+Jogo ||--|| GameManager : contém
+GameManager ||--|| Menu : gerencia
+GameManager ||--|| Player : contém
+GameManager ||--|| TileMap : usa
+GameManager ||--|| Background : usa
+GameManager ||--|| GameInterface : usa
+GameManager ||--|| SpawnManager : usa
+GameManager ||--o{ Projetil : gerencia
+GameManager ||--o{ Particle : gerencia
+
+Player --|> Entidade : herda
+Slime --|> Entidade : herda
+
+Player ||--o{ Projetil : cria
+Player ||--o{ Particle : cria
+
+SpawnManager ||--o{ Slime : gerencia
+SpawnManager ||--|| TileMap : usa
+SpawnManager ||--|| Player : observa
+
+Entidade ||--o{ Animation : usa
+Projetil ||--o{ Animation : usa
+Particle ||--|| Animation : usa
+
+TileMap ||--o{ Animation : carrega assets
+
+@enduml
