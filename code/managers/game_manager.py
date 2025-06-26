@@ -115,7 +115,7 @@ class GameManager:
         self.__game_interface = GameInterface(self)
         self.__game_interface.reset_timer()
 
-        self.__tilemap.load("data/mapas/map.json")
+        self.__tilemap.load("data/mapas/map1.json")
             
         for spawner in self.__tilemap.procurar_objeto([('Spawners', 0)]):
 
