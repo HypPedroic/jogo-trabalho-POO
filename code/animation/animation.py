@@ -53,9 +53,16 @@ class Animation:
         return Animation(self.__images, self.__img_duration, self.__loop)
     
     def img(self):
+        # Verificação de segurança para evitar erro de índice
+        if len(self.__images) == 0:
+            return None
         return self.__images[int(self.__frame / self.__img_duration)]
     
     def update(self):
+        # Verificação de segurança para evitar divisão por zero
+        if len(self.__images) == 0:
+            return
+            
         if self.__loop:
             self.__frame = (self.__frame + 1) % (self.__img_duration * len(self.__images))
         else:

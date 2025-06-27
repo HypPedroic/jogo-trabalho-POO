@@ -4,13 +4,13 @@ import random
 import math
 from .entidade import Entidade
 from utils.utils import load_images
-from utils.animation import Animation
+from animation.animation import Animation
 
 class Slime(Entidade):
-    def __init__(self, pos, tamanho):
+    def __init__(self, pos, tamanho, game=None):
         # Carregando os assets do slime
         self.__assets = {
-            'idle': Animation(load_images('inimigos/slime/idle'), img_dur=12),
+            'idle': Animation(load_images('inimigos/slime/idle'), img_dur=24),
             'andar': Animation(load_images('inimigos/slime/andar'), img_dur=8),
             'ataque': Animation(load_images('inimigos/slime/ataque'), img_dur=6),
             'morrer': Animation(load_images('inimigos/slime/morrer'), img_dur=10),
@@ -27,6 +27,7 @@ class Slime(Entidade):
         self.__dano = 1
         self.__estado = 'patrulhando'  # patrulhando, perseguindo, atacando, morto
         self.__direcao = random.choice([-1, 1])  # -1 esquerda, 1 direita
+        self.__game = game
         
         # Velocidades
         self.__velocidade_patrulha = 0.3
@@ -79,14 +80,22 @@ class Slime(Entidade):
     @estado.setter
     def estado(self, valor):
         self.__estado = valor
+        
+    @property
+    def game(self):
+        return self.__game
     
-    def pode_atacar_jogador(self):
+    @game.setter
+    def game(self, valor):
+        self.__game = valor
+    
+    def pode_atacar_jogador_colisao(self):
         """Verifica se o slime pode atacar o jogador"""
         return self.__estado != 'morto' and self.__iframes == 0
     
-    def atacar_jogador(self, game=None):
+    def atacar_jogador_colisao(self, game=None):
         """Ataca o jogador causando dano"""
-        if self.pode_atacar_jogador():
+        if self.pode_atacar_jogador_colisao():
             self.__player.receber_dano(self.__dano)
             self.__iframes = self.__duracao_iframes
             if game:
@@ -106,8 +115,7 @@ class Slime(Entidade):
         self.__tempo_patrulha = 0
         self.__iframes = 0
         self.__tempo_animacao_morte = 0
-        for animacao in self.__assets.values():
-            animacao.reset()
+        
     
     def receber_dano(self, dano):
         """Aplica dano ao slime"""
@@ -201,7 +209,7 @@ class Slime(Entidade):
         self.velocidade[0] = self.__direcao * self.__velocidade_patrulha
         self.__tempo_patrulha -= 1
     
-    def __atacar_jogador(self, game=None):
+    def atacar_jogador(self, game=None):
         """Ataca o jogador se estiver no alcance"""
         if self.__pode_atacar_jogador():
             self.__estado = 'atacando'

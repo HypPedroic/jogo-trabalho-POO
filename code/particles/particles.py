@@ -1,7 +1,7 @@
 
 import pygame
 from utils.utils import load_images
-from utils.animation import Animation
+from animation.animation import Animation
 
 class Particle:
     def __init__(self, p_type, pos, velocity=[0, 0], frame=0):
