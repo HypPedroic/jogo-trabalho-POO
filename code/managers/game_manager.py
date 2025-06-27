@@ -109,10 +109,13 @@ class GameManager:
     @display.setter
     def display(self, value):
         self.__display = value
+<<<<<<< HEAD
     
     @property
     def spawn_manager(self):
         return self.__spawn_manager
+=======
+>>>>>>> main
 
     def tocar_som(self, nome_som):
         if nome_som in self.__sons:

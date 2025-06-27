@@ -2,7 +2,11 @@
 import pygame
 import random
 from entidades.slime import Slime
+<<<<<<< HEAD
 from entidades.esqueleto import Esqueleto
+=======
+from entidades.isqueleto import Isqueleto
+>>>>>>> main
 
 class SpawnManager:
     def __init__(self, tilemap, player, num_inimigos=15, game=None):
@@ -111,7 +115,11 @@ class SpawnManager:
                 slime = Slime((0, 0), (16, 16))
                 self.__inimigos_pool.append(slime)
             else:
+<<<<<<< HEAD
                 esqueleto = Esqueleto((0, 0), (32, 32), game=self.__game) 
+=======
+                esqueleto = Isqueleto((0, 0), (32, 32), game=self.__game) 
+>>>>>>> main
                 self.__inimigos_pool.append(esqueleto)
 
     

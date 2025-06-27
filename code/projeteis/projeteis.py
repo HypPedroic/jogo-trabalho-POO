@@ -20,6 +20,7 @@ class Projetil:
         self.__set_action('projetil')
         self.__vidaMax = 1
         self.__vida = self.__vidaMax
+<<<<<<< HEAD
         self.__tipo = tipo
         
         if self.__tipo == 'projetil':
@@ -30,6 +31,14 @@ class Projetil:
         if self.__tipo == 'projetil':
             self.__anim_offeset = (-32, -32)
             self.__velocidade = 10
+=======
+        self.__duracao = 60
+        self.__tipo = tipo
+        
+        if self.__tipo == 'projetil':
+            self.__anim_offeset = (-32, -32)
+            self.__velocidade = 6
+>>>>>>> main
         elif self.__tipo == 'osso':
             self.__anim_offeset = (0, 0)
             self.__velocidade = 4
@@ -122,6 +131,7 @@ class Projetil:
     @velocidade.setter
     def velocidade(self, value):
         self.__velocidade = value
+<<<<<<< HEAD
         
     @property
     def duracao(self):
@@ -130,6 +140,8 @@ class Projetil:
     @duracao.setter
     def duracao(self, value):
         self.__duracao = value
+=======
+>>>>>>> main
     
     def mover_direita(self, estado=True):
         self.__movimento[0] = estado
