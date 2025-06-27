@@ -16,15 +16,15 @@ class Editor:
     # Inicializando o jogo
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((832, 640))
+        self.__screen = pygame.display.set_mode((832, 640))
         pygame.display.set_caption("editor")
-        self.clock = pygame.time.Clock()
-        self.running = True
+        self.__clock = pygame.time.Clock()
+        self.__running = True
         
-        self.movemento = [False, False, False, False]
+        self.__movemento = [False, False, False, False]
         
         # Carregando as imagens
-        self.assets = {
+        self.__assets = {
             'grass': load_images('tiles/grama'),
             'Stones': load_images('Objetos/Stones'),
             'Trees': load_images('Objetos/Trees'),
@@ -41,23 +41,127 @@ class Editor:
             #'stone': load_images('tiles/pedra'),  # Adicione mais tipos de tiles aqui
         }
 
-        self.tilemap = TileMap(32)
+        self.__tilemap = TileMap(32)
 
         try:
-            self.tilemap.load('data/mapas/map2.json')
+            self.__tilemap.load('data/mapas/map2.json')
         except FileNotFoundError:
             pass
 
-        self.camera = [0, 0]
+        self.__camera = [0, 0]
 
-        self.tile_list = list(self.assets)
-        self.tile_group = 0
-        self.tile_variant = 0
+        self.__tile_list = list(self.assets)
+        self.__tile_group = 0
+        self.__tile_variant = 0
 
-        self.clicking = False
-        self.right_click = False
+        self.__clicking = False
+        self.__right_click = False
 
-        self.ongrid = True
+        self.__ongrid = True
+        
+    @property
+    def screen(self):
+        return self.__screen
+
+    @screen.setter
+    def screen(self, value):
+        self.__screen = value
+
+    @property
+    def clock(self):
+        return self.__clock
+
+    @clock.setter
+    def clock(self, value):
+        self.__clock = value
+
+    @property
+    def running(self):
+        return self.__running
+
+    @running.setter
+    def running(self, value):
+        self.__running = value
+
+    @property
+    def movemento(self):
+        return self.__movemento
+
+    @movemento.setter
+    def movemento(self, value):
+        self.__movemento = value
+
+    @property
+    def assets(self):
+        return self.__assets
+
+    @assets.setter
+    def assets(self, value):
+        self.__assets = value
+
+    @property
+    def tilemap(self):
+        return self.__tilemap
+
+    @tilemap.setter
+    def tilemap(self, value):
+        self.__tilemap = value
+
+    @property
+    def camera(self):
+        return self.__camera
+
+    @camera.setter
+    def camera(self, value):
+        self.__camera = value
+
+    @property
+    def tile_list(self):
+        return self.__tile_list
+
+    @tile_list.setter
+    def tile_list(self, value):
+        self.__tile_list = value
+
+    @property
+    def tile_group(self):
+        return self.__tile_group
+
+    @tile_group.setter
+    def tile_group(self, value):
+        self.__tile_group = value
+
+    @property
+    def tile_variant(self):
+        return self.__tile_variant
+
+    @tile_variant.setter
+    def tile_variant(self, value):
+        self.__tile_variant = value
+
+    @property
+    def clicking(self):
+        return self.__clicking
+
+    @clicking.setter
+    def clicking(self, value):
+        self.__clicking = value
+
+    @property
+    def right_click(self):
+        return self.__right_click
+
+    @right_click.setter
+    def right_click(self, value):
+        self.__right_click = value
+
+    @property
+    def ongrid(self):
+        return self.__ongrid
+
+    @ongrid.setter
+    def ongrid(self, value):
+        self.__ongrid = value
 
 
 

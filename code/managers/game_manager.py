@@ -248,8 +248,11 @@ class GameManager:
         self.background = Background(self.__screen.get_height())
         self.game_interface = GameInterface(self)
         self.game_interface.reset_timer()
-
-        self.__tilemap.load("data/mapas/map1.json")
+        
+        try:
+            self.tilemap.load("data/mapas/map1.json")
+        except:
+            pass
             
         for spawner in self.__tilemap.procurar_objeto([('Spawners', 0)]):
 
