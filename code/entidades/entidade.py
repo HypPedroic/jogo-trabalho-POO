@@ -25,7 +25,7 @@ class Entidade:
         }
         
         # Configura as transições de estado inicial
-        self.__configurar_transicoes_animacao()
+        self.configurar_transicoes_animacao()
         self.set_action('idle')
     
     # Definindo property e setter para os atributos necessários    
@@ -100,26 +100,42 @@ class Entidade:
     @movimento.setter
     def movimento(self, value):
         self.__movimento = value
+        
+    @property
+    def estados_animacao(self):
+        return self.__estados_animacao
+
+    @estados_animacao.setter
+    def estados_animacao(self, value):
+        self.__estados_animacao = value
+
+    @property
+    def animation(self):
+        return self.__animation
+
+    @animation.setter
+    def animation(self, value):
+        self.__animation = value
     
     def mover_direita(self, estado=True):
-        self.__movimento[0] = estado
+        self.movimento[0] = estado
 
     def mover_esquerda(self, estado=True):
-        self.__movimento[1] = estado
+        self.movimento[1] = estado
     
-    def __configurar_transicoes_animacao(self):
+    def configurar_transicoes_animacao(self):
         """Configura as transições entre estados de animação"""
-        for estado, config in self.__estados_animacao.items():
-            if estado in self.__assets:
-                self.__assets[estado].loop = config['loop']
+        for estado, config in self.estados_animacao.items():
+            if estado in self.assets:
+                self.assets[estado].loop = config['loop']
                 if config['next_state']:
-                    self.__assets[estado].add_state_transition(estado, config['next_state'])
+                    self.assets[estado].add_state_transition(estado, config['next_state'])
     
     def set_action(self, action):
         """Define a ação atual e configura a animação apropriada"""
-        if action != self.__action and action in self.__assets:
-            self.__action = action
-            self.__assets[self.__action].reset()
+        if action != self.action and action in self.assets:
+            self.action = action
+            self.assets[self.action].reset()
     
     # Definindo os métodos necessários para movimentação, física e renderização
     
@@ -128,73 +144,73 @@ class Entidade:
         # Cria uma caixa de colisão menor e centralizada
         offset_x = 0
         offset_y = 0
-        return pygame.Rect(self.__pos[0] + offset_x, self.__pos[1] + offset_y, 16, self.__tamanho[1])
+        return pygame.Rect(self.pos[0] + offset_x, self.pos[1] + offset_y, 16, self.tamanho[1])
 
     def set_action(self, action):
-        if action != self.__action:
-            self.__action = action
-            self.animation = self.__assets[action].copy()
+        if action != self.action:
+            self.action = action
+            self.animation = self.assets[action].copy()
 
     # Método que vai atuar na movimentação da entidade e na física   
     def update(self, tilemap):
         #Reseta as colisões
-        self.__colisoes = {'cima': False, 'baixo': False, 'esquerda': False, 'direita': False}
+        self.colisoes = {'cima': False, 'baixo': False, 'esquerda': False, 'direita': False}
 
-        self.__movimentar_X(tilemap)
-        self.__movimentar_Y(tilemap)
+        self.movimentar_X(tilemap)
+        self.movimentar_Y(tilemap)
 
         self.animation.update()
 
-    def __movimentar_X(self, tilemap):
-        movimento_x = self.__movimento[0] - self.__movimento[1]
-        frame_movement = (movimento_x + self.__velocidade[0])
+    def movimentar_X(self, tilemap):
+        movimento_x = self.movimento[0] - self.movimento[1]
+        frame_movement = (movimento_x + self.velocidade[0])
 
-        self.__pos[0] += frame_movement * 2
+        self.pos[0] += frame_movement * 2
         # Verifica se a entidade está colidindo com algum retângulo de colisão para o eixo X
-        self.__colisao_X(tilemap, frame_movement)
+        self.colisao_X(tilemap, frame_movement)
             
         if movimento_x > 0:
-            self.__flip = False
+            self.flip = False
         elif movimento_x < 0:
-            self.__flip = True
+            self.flip = True
 
-    def __movimentar_Y(self, tilemap):
-        self.__pos[1] += self.__velocidade[1]
+    def movimentar_Y(self, tilemap):
+        self.pos[1] += self.velocidade[1]
         # Verifica se a entidade está colidindo com algum retângulo de colisão para o eixo Y
         self.fisica_colisao_Y(tilemap)
 
-    def __colisao_X(self, tilemap, movimento):
+    def colisao_X(self, tilemap, movimento):
         retangulo_colisao = self.retangulo()
-        for rect in tilemap.fisica_rect_around(self.__pos):
+        for rect in tilemap.fisica_rect_around(self.pos):
             if retangulo_colisao.colliderect(rect):
                 if movimento > 0:
                     retangulo_colisao.right = rect.left
-                    self.__colisoes['direita'] = True
+                    self.colisoes['direita'] = True
                 if movimento < 0:
                     retangulo_colisao.left = rect.right
-                    self.__colisoes['esquerda'] = True
-                self.__pos[0] = retangulo_colisao.x
+                    self.colisoes['esquerda'] = True
+                self.pos[0] = retangulo_colisao.x
 
     def fisica_colisao_Y(self, tilemap):
         retangulo_colisao = self.retangulo()
-        for rect in tilemap.fisica_rect_around(self.__pos):
+        for rect in tilemap.fisica_rect_around(self.pos):
             if retangulo_colisao.colliderect(rect):
-                if self.__velocidade[1] > 0:
+                if self.velocidade[1] > 0:
                     retangulo_colisao.bottom = rect.top
-                    self.__colisoes['baixo'] = True
-                if self.__velocidade[1] < 0:
+                    self.colisoes['baixo'] = True
+                if self.velocidade[1] < 0:
                     retangulo_colisao.top = rect.bottom
-                    self.__colisoes['cima'] = True
-                self.__pos[1] = retangulo_colisao.y
+                    self.colisoes['cima'] = True
+                self.pos[1] = retangulo_colisao.y
 
-        self.__velocidade[1] = min(self.__velocidade[1]+0.15, 4)
-        if self.__colisoes['cima'] or self.__colisoes['baixo']:
-            self.__velocidade[1] = 0
+        self.velocidade[1] = min(self.velocidade[1]+0.15, 4)
+        if self.colisoes['cima'] or self.colisoes['baixo']:
+            self.velocidade[1] = 0
 
     # Método que vai renderizar a entidade na tela
     def renderizar(self, surf, offset=(0, 0)):
         # Renderiza a entidade na tela
-        surf.blit(pygame.transform.flip(self.animation.img(), self.__flip, False), (self.__pos[0] - offset[0] + self.__anim_offeset[0], self.__pos[1] - offset[1] + self.__anim_offeset[1]))
+        surf.blit(pygame.transform.flip(self.animation.img(), self.flip, False), (self.pos[0] - offset[0] + self.anim_offeset[0], self.pos[1] - offset[1] + self.anim_offeset[1]))
         #surf.blit(self.game.assets['player'], (self.pos[0] - offset[0], self.pos[1] - offset[1]))
 
 

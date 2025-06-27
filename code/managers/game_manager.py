@@ -38,6 +38,166 @@ class GameManager:
 
         # Sistema de áudio
         self.__carregar_sistema_audio()
+        
+    @property
+    def screen(self):
+        return self.__screen
+
+    @screen.setter
+    def screen(self, value):
+        self.__screen = value
+
+    @property
+    def display(self):
+        return self.__display
+
+    @display.setter
+    def display(self, value):
+        self.__display = value
+
+    @property
+    def clock(self):
+        return self.__clock
+
+    @clock.setter
+    def clock(self, value):
+        self.__clock = value
+
+    @property
+    def camera(self):
+        return self.__camera
+
+    @camera.setter
+    def camera(self, value):
+        self.__camera = value
+
+    @property
+    def running(self):
+        return self.__running
+
+    @running.setter
+    def running(self, value):
+        self.__running = value
+
+    @property
+    def estado(self):
+        return self.__estado
+
+    @estado.setter
+    def estado(self, value):
+        self.__estado = value
+
+    @property
+    def nome_jogador(self):
+        return self.__nome_jogador
+
+    @nome_jogador.setter
+    def nome_jogador(self, value):
+        self.__nome_jogador = value
+
+    @property
+    def dificuldade(self):
+        return self.__dificuldade
+
+    @dificuldade.setter
+    def dificuldade(self, value):
+        self.__dificuldade = value
+
+    @property
+    def num_inimigos(self):
+        return self.__num_inimigos
+
+    @num_inimigos.setter
+    def num_inimigos(self, value):
+        self.__num_inimigos = value
+
+    @property
+    def menu(self):
+        return self.__menu
+
+    @menu.setter
+    def menu(self, value):
+        self.__menu = value
+
+    @property
+    def player(self):
+        return self.__player
+
+    @player.setter
+    def player(self, value):
+        self.__player = value
+
+    @property
+    def tilemap(self):
+        return self.__tilemap
+
+    @tilemap.setter
+    def tilemap(self, value):
+        self.__tilemap = value
+
+    @property
+    def background(self):
+        return self.__background
+
+    @background.setter
+    def background(self, value):
+        self.__background = value
+
+    @property
+    def game_interface(self):
+        return self.__game_interface
+
+    @game_interface.setter
+    def game_interface(self, value):
+        self.__game_interface = value
+
+    @property
+    def spawn_manager(self):
+        return self.__spawn_manager
+
+    @spawn_manager.setter
+    def spawn_manager(self, value):
+        self.__spawn_manager = value
+
+    @property
+    def projeteis(self):
+        return self.__projeteis
+
+    @projeteis.setter
+    def projeteis(self, value):
+        self.__projeteis = value
+
+    @property
+    def inimigos(self):
+        return self.__inimigos
+
+    @inimigos.setter
+    def inimigos(self, value):
+        self.__inimigos = value
+
+    @property
+    def particulas(self):
+        return self.__particulas
+
+    @particulas.setter
+    def particulas(self, value):
+        self.__particulas = value
+
+    @property
+    def musicas(self):
+        return self.__musicas
+
+    @musicas.setter
+    def musicas(self, value):
+        self.__musicas = value
+
+    @property
+    def sons(self):
+        return self.__sons
+
+    @sons.setter
+    def sons(self, value):
+        self.__sons = value
 
     def __carregar_sistema_audio(self):
         self.__musicas = [
@@ -58,65 +218,6 @@ class GameManager:
         except pygame.error as e:
             print(f"Erro ao carregar sons: {e}")
 
-    @property
-    def player(self):
-        return self.__player
-
-    @property
-    def estado(self):
-        return self.__estado
-
-    @estado.setter
-    def estado(self, value):
-        self.__estado = value
-
-    @property
-    def running(self):
-        return self.__running
-
-    @running.setter
-    def running(self, value):
-        self.__running = value
-
-    @property
-    def menu(self):
-        return self.__menu
-
-    @property
-    def clock(self):
-        return self.__clock
-
-    @property
-    def projeteis(self):
-        return self.__projeteis
-    
-    @projeteis.setter
-    def projeteis(self, value):
-        self.__projeteis = value
-
-    @property
-    def inimigos(self):
-        return self.__inimigos
-
-    @property
-    def particulas(self):
-        return self.__particulas
-    
-    @property
-    def display(self):
-        return self.__display
-    
-    @display.setter
-    def display(self, value):
-        self.__display = value
-<<<<<<< HEAD
-    
-    @property
-    def spawn_manager(self):
-        return self.__spawn_manager
-=======
->>>>>>> main
-
     def tocar_som(self, nome_som):
         if nome_som in self.__sons:
             try:
@@ -135,18 +236,18 @@ class GameManager:
             print(f"Erro ao carregar música: {e}")
 
     def iniciar_jogo(self, dados_jogo):
-        self.__nome_jogador = dados_jogo["nome"]
-        self.__dificuldade = dados_jogo["dificuldade"]
-        self.__num_inimigos = dados_jogo["num_inimigos"]
+        self.nome_jogador = dados_jogo["nome"]
+        self.dificuldade = dados_jogo["dificuldade"]
+        self.num_inimigos = dados_jogo["num_inimigos"]
         self.__inicializar_componentes_jogo()
-        self.__estado = "jogando"
+        self.estado = "jogando"
 
     def __inicializar_componentes_jogo(self):
-        self.__player = Player([0, 0], (20, 32))
-        self.__tilemap = TileMap(32)
-        self.__background = Background(self.__screen.get_height())
-        self.__game_interface = GameInterface(self)
-        self.__game_interface.reset_timer()
+        self.player = Player([0, 0], (20, 32))
+        self.tilemap = TileMap(32)
+        self.background = Background(self.__screen.get_height())
+        self.game_interface = GameInterface(self)
+        self.game_interface.reset_timer()
 
         self.__tilemap.load("data/mapas/map1.json")
             
@@ -154,100 +255,100 @@ class GameManager:
 
             print(spawner["pos"])
             if spawner['variant'] == 0:
-                self.__player.pos = spawner['pos']
+                self.player.pos = spawner['pos']
 
 
         try:
-            self.__background = Background.load("data/backgrounds/default.json")
+            self.background = Background.load("data/backgrounds/default.json")
         except FileNotFoundError:
             pass
         
         
 
-        self.__spawn_manager = SpawnManager(self.__tilemap, self.__player, self.__num_inimigos, game=self)
-        self.__spawn_manager.spawn_todos_inimigos()
+        self.spawn_manager = SpawnManager(self.tilemap, self.player, self.num_inimigos, game=self)
+        self.spawn_manager.spawn_todos_inimigos()
         self.__tocar_musica_aleatoria()
 
     def __player_morreu(self):
         tempo_jogo = None
-        if self.__game_interface:
+        if self.game_interface:
             tempo_atual = pygame.time.get_ticks()
-            tempo_jogo = (tempo_atual - self.__game_interface._GameInterface__start_time) // 1000
+            tempo_jogo = (tempo_atual - self.game_interface._GameInterface__start_time) // 1000
         self.__remover_progresso()  # Remove o save ao dar game over, se for do mesmo jogador
-        self.__estado = "game_over"
-        self.__menu.mostrar_game_over(tempo_jogo)
+        self.estado = "game_over"
+        self.menu.mostrar_game_over(tempo_jogo)
         pygame.mixer.music.stop()
 
     def __player_venceu(self):
         tempo_jogo = None
-        if self.__game_interface:
+        if self.game_interface:
             tempo_atual = pygame.time.get_ticks()
-            tempo_jogo = (tempo_atual - self.__game_interface._GameInterface__start_time) // 1000
+            tempo_jogo = (tempo_atual - self.game_interface._GameInterface__start_time) // 1000
         pygame.mixer.music.stop()
         estatisticas = {
             "tempo": tempo_jogo,
-            "inimigos_mortos": self.__spawn_manager.get_inimigos_mortos() if self.__spawn_manager else 0,
-            "total_inimigos": self.__spawn_manager.get_total_inimigos() if self.__spawn_manager else 0,
-            "vida_restante": self.__player.vida if self.__player else 0,
-            "vida_maxima": self.__player.vidaMax if self.__player else 0,
+            "inimigos_mortos": self.spawn_manager.get_inimigos_mortos() if self.spawn_manager else 0,
+            "total_inimigos": self.spawn_manager.get_total_inimigos() if self.spawn_manager else 0,
+            "vida_restante": self.player.vida if self.player else 0,
+            "vida_maxima": self.player.vidaMax if self.player else 0,
         }
         self.__remover_progresso()  # Remove o save ao vencer, se for do mesmo jogador
-        self.__estado = "vitoria"
-        if hasattr(self.__menu, "mostrar_vitoria"):
-            self.__menu.mostrar_vitoria(tempo_jogo, estatisticas)
+        self.estado = "vitoria"
+        if hasattr(self.menu, "mostrar_vitoria"):
+            self.menu.mostrar_vitoria(tempo_jogo, estatisticas)
 
     def update(self):
-        if self.__estado == "jogando":
+        if self.estado == "jogando":
             self.__update_jogo()
 
     def __update_jogo(self):
         
-        if not all([self.__player, self.__tilemap, self.__background, self.__game_interface]):
+        if not all([self.player, self.tilemap, self.background, self.game_interface]):
             return
 
-        self.__display.fill((52, 222, 235))
+        self.display.fill((52, 222, 235))
 
         self.__atualizar_camera()
-        camera_movement = (int(self.__camera[0]), int(self.__camera[1]))
+        camera_movement = (int(self.camera[0]), int(self.camera[1]))
 
-        self.__background.update(self.__camera)
-        self.__background.render(self.__display)
+        self.background.update(self.camera)
+        self.background.render(self.display)
 
-        self.__tilemap.renderizar(self.__display, offset=camera_movement)
+        self.tilemap.renderizar(self.display, offset=camera_movement)
 
-        self.__player.update(self.__tilemap, self)
-        self.__player.renderizar(self.__display, offset=camera_movement)
+        self.player.update(self.tilemap, self)
+        self.player.renderizar(self.display, offset=camera_movement)
 
-        if self.__spawn_manager:
-            self.__spawn_manager.update()
-            self.__spawn_manager.render(self.__display, camera_movement)
-            self.__spawn_manager.verificar_colisoes_projeteis(self.projeteis)
+        if self.spawn_manager:
+            self.spawn_manager.update()
+            self.spawn_manager.render(self.display, camera_movement)
+            self.spawn_manager.verificar_colisoes_projeteis(self.projeteis)
 
         self.__atualizar_projeteis(camera_movement)
         self.__atualizar_Particulas(camera_movement)
         self.__verificar_estado_jogo()
 
-        self.__game_interface.render(self.__display)
+        self.game_interface.render(self.display)
 
-        self.__screen.blit(
-            pygame.transform.scale(self.__display, self.__screen.get_size()), (0, 0)
+        self.screen.blit(
+            pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
         )
 
     def __atualizar_camera(self):
-        self.__camera[0] += (
-            self.__player.retangulo().centerx
-            - self.__display.get_width() / 2
-            - self.__camera[0]
+        self.camera[0] += (
+            self.player.retangulo().centerx
+            - self.display.get_width() / 2
+            - self.camera[0]
         ) / 16
-        self.__camera[1] += (
-            self.__player.retangulo().centery
-            - self.__display.get_height() / 2
-            - self.__camera[1]
+        self.camera[1] += (
+            self.player.retangulo().centery
+            - self.display.get_height() / 2
+            - self.camera[1]
         ) / 16
 
     def __atualizar_projeteis(self, camera_movement):
         for projetil in self.projeteis:
-            projetil.update(self, self.__tilemap)
+            projetil.update(self, self.tilemap)
             projetil.renderizar(self.display, offset=camera_movement)
             if projetil.vida <= 0:
                 self.projeteis.remove(projetil)
@@ -260,18 +361,18 @@ class GameManager:
                 self.particulas.remove(particula)
 
     def __verificar_estado_jogo(self):
-        if self.__player.vida <= 0:
+        if self.player.vida <= 0:
             self.__player_morreu()
-        elif self.__spawn_manager and self.__spawn_manager.get_inimigos_vivos() == 0:
+        elif self.spawn_manager and self.spawn_manager.get_inimigos_vivos() == 0:
             self.__player_venceu()
 
     def __salvar_progresso(self):
-        if not self.__player:
+        if not self.player:
             return False
         # Salvar inimigos vivos (posição e estado)
         inimigos_vivos = []
-        if self.__spawn_manager:
-            for inimigo in self.__spawn_manager._SpawnManager__inimigos_ativos:
+        if self.spawn_manager:
+            for inimigo in self.spawn_manager._SpawnManager__inimigos_ativos:
                 if hasattr(inimigo, 'pos') and getattr(inimigo, 'estado', None) != 'morto':
                     inimigo_data = {
                         'pos': list(inimigo.pos),
@@ -284,21 +385,21 @@ class GameManager:
                         inimigo_data['vida_maxima'] = getattr(inimigo, 'vida_maxima', 2)
                     inimigos_vivos.append(inimigo_data)
         progresso = {
-            "nome": self.__nome_jogador,
-            "dificuldade": self.__dificuldade,
-            "num_inimigos": self.__num_inimigos,
+            "nome": self.nome_jogador,
+            "dificuldade": self.dificuldade,
+            "num_inimigos": self.num_inimigos,
             "player": {
-                "pos": list(self.__player.pos),
-                "vida": self.__player.vida,
-                "vidaMax": self.__player.vidaMax,
-                "furia": self.__player.furia,
-                "estado": self.__player.estado,
-                "pulos_disponiveis": self.__player.pulos_disponiveis,
+                "pos": list(self.player.pos),
+                "vida": self.player.vida,
+                "vidaMax": self.player.vidaMax,
+                "furia": self.player.furia,
+                "estado": self.player.estado,
+                "pulos_disponiveis": self.player.pulos_disponiveis,
             },
-            "tempo": self.__game_interface.get_tempo() if self.__game_interface else 0,
-            "inimigos_vivos": self.__spawn_manager.get_inimigos_vivos() if self.__spawn_manager else 0,
-            "inimigos_mortos": self.__spawn_manager.get_inimigos_mortos() if self.__spawn_manager else 0,
-            "inimigos_totais": self.__spawn_manager.get_total_inimigos() if self.__spawn_manager else 0,
+            "tempo": self.game_interface.get_tempo() if self.game_interface else 0,
+            "inimigos_vivos": self.spawn_manager.get_inimigos_vivos() if self.spawn_manager else 0,
+            "inimigos_mortos": self.spawn_manager.get_inimigos_mortos() if self.spawn_manager else 0,
+            "inimigos_totais": self.spawn_manager.get_total_inimigos() if self.spawn_manager else 0,
             "inimigos_ativos": inimigos_vivos
         }
         import os, json
@@ -323,7 +424,7 @@ class GameManager:
             try:
                 with open(save_path, "r", encoding="utf-8") as f:
                     progresso = json.load(f)
-                if progresso.get("nome") == self.__nome_jogador:
+                if progresso.get("nome") == self.nome_jogador:
                     os.remove(save_path)
             except Exception:
                 pass
@@ -332,24 +433,24 @@ class GameManager:
         progresso = self.__carregar_progresso()
         if not progresso:
             return
-        self.__nome_jogador = progresso["nome"]
-        self.__dificuldade = progresso["dificuldade"]
-        self.__num_inimigos = progresso["num_inimigos"]
+        self.nome_jogador = progresso["nome"]
+        self.dificuldade = progresso["dificuldade"]
+        self.num_inimigos = progresso["num_inimigos"]
         self.__inicializar_componentes_jogo()
         # Restaurar player
         p = progresso["player"]
-        self.__player.pos = p["pos"]
-        self.__player.vida = p["vida"]
-        self.__player.vidaMax = p["vidaMax"]
-        self.__player.furia = p["furia"]
-        self.__player.estado = p["estado"]
-        self.__player.pulos_disponiveis = p["pulos_disponiveis"]
+        self.player.pos = p["pos"]
+        self.player.vida = p["vida"]
+        self.player.vidaMax = p["vidaMax"]
+        self.player.furia = p["furia"]
+        self.player.estado = p["estado"]
+        self.player.pulos_disponiveis = p["pulos_disponiveis"]
         # Restaurar tempo
-        if self.__game_interface:
-            self.__game_interface.set_tempo(progresso.get("tempo", 0))
+        if self.game_interface:
+            self.game_interface.set_tempo(progresso.get("tempo", 0))
         # Restaurar inimigos ativos
-        if self.__spawn_manager:
-            self.__spawn_manager._SpawnManager__inimigos_ativos.clear()
+        if self.spawn_manager:
+            self.spawn_manager._SpawnManager__inimigos_ativos.clear()
             for inimigo_data in progresso.get("inimigos_ativos", []):
                 if inimigo_data['tipo'] == 'Slime':
                     from entidades.slime import Slime
@@ -357,7 +458,7 @@ class GameManager:
                     # Restaurar propriedades do slime
                     inimigo.vida = inimigo_data.get('vida', 1)
                     inimigo.estado = inimigo_data.get('estado', 'idle')
-                    self.__spawn_manager._SpawnManager__inimigos_ativos.append(inimigo)
+                    self.spawn_manager._SpawnManager__inimigos_ativos.append(inimigo)
                 elif inimigo_data['tipo'] == 'Esqueleto':
                     from entidades.esqueleto import Esqueleto
                     inimigo = Esqueleto(tuple(inimigo_data['pos']), (32, 32), game=self)
@@ -365,37 +466,37 @@ class GameManager:
                     inimigo.vida = inimigo_data.get('vida', 2)
                     inimigo.vida_maxima = inimigo_data.get('vida_maxima', 2)
                     inimigo.estado = inimigo_data.get('estado', 'inativo')
-                    self.__spawn_manager._SpawnManager__inimigos_ativos.append(inimigo)
-            self.__spawn_manager._SpawnManager__inimigos_mortos = progresso.get("inimigos_mortos", 0)
-            self.__spawn_manager._SpawnManager__max_inimigos = len(progresso.get("inimigos_ativos", []))
-            self.__spawn_manager._SpawnManager__inimigos_totais = progresso.get("inimigos_totais", self.__num_inimigos)
-        self.__estado = "jogando"
+                    self.spawn_manager._SpawnManager__inimigos_ativos.append(inimigo)
+            self.spawn_manager._SpawnManager__inimigos_mortos = progresso.get("inimigos_mortos", 0)
+            self.spawn_manager._SpawnManager__max_inimigos = len(progresso.get("inimigos_ativos", []))
+            self.spawn_manager._SpawnManager__inimigos_totais = progresso.get("inimigos_totais", self.__num_inimigos)
+        self.estado = "jogando"
 
     def mostrar_menu_pausa(self):
-        largura, altura = self.__screen.get_size()
+        largura, altura = self.screen.get_size()
         fonte = pygame.font.SysFont("Arial", 32, bold=True)
         opcoes = ["Salvar", "Sair", "Voltar"]
         selecionado = 0
         rodando = True
         mensagem = ""
         tempo_pausado = 0
-        if self.__game_interface:
-            tempo_pausado = self.__game_interface.get_tempo()
+        if self.game_interface:
+            tempo_pausado = self.game_interface.get_tempo()
         while rodando:
-            self.__screen.fill((25, 25, 35))
+            self.screen.fill((25, 25, 35))
             titulo = fonte.render("PAUSADO", True, (64, 224, 208))
-            self.__screen.blit(titulo, (largura // 2 - titulo.get_width() // 2, 120))
+            self.screen.blit(titulo, (largura // 2 - titulo.get_width() // 2, 120))
             for i, texto in enumerate(opcoes):
                 cor = (255, 99, 71) if i == selecionado else (240, 240, 240)
                 botao = fonte.render(texto, True, cor)
-                self.__screen.blit(botao, (largura // 2 - botao.get_width() // 2, 220 + i * 70))
+                self.screen.blit(botao, (largura // 2 - botao.get_width() // 2, 220 + i * 70))
             if mensagem:
                 msg_surf = fonte.render(mensagem, True, (0,255,0))
-                self.__screen.blit(msg_surf, (largura // 2 - msg_surf.get_width() // 2, 450))
+                self.screen.blit(msg_surf, (largura // 2 - msg_surf.get_width() // 2, 450))
             pygame.display.flip()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.__running = False
+                    self.running = False
                     return "sair"
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
@@ -415,46 +516,46 @@ class GameManager:
                             rodando = False
                             mensagem = ""
                             # Retomar cronômetro
-                            if self.__game_interface:
-                                self.__game_interface.set_tempo(tempo_pausado)
+                            if self.game_interface:
+                                self.game_interface.set_tempo(tempo_pausado)
                     elif event.key == pygame.K_ESCAPE:
                         rodando = False
                         mensagem = ""
-                        if self.__game_interface:
-                            self.__game_interface.set_tempo(tempo_pausado)
+                        if self.game_interface:
+                            self.game_interface.set_tempo(tempo_pausado)
         return None
 
     def processar_eventos(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.__running = False
+                self.running = False
             elif event.type == pygame.KEYDOWN:
-                if self.__estado == "jogando" and event.key == pygame.K_ESCAPE:
+                if self.estado == "jogando" and event.key == pygame.K_ESCAPE:
                     acao = self.mostrar_menu_pausa()
                     if acao == "sair":
-                        self.__estado = "menu"
-                        self.__menu.voltar_menu_principal()
+                        self.estado = "menu"
+                        self.menu.voltar_menu_principal()
                 else:
                     self.__processar_input_teclado(event.key, True)
             elif event.type == pygame.KEYUP:
                 self.__processar_input_teclado(event.key, False)
 
     def __processar_input_teclado(self, key, pressed):
-        if self.__estado == "jogando":
+        if self.estado == "jogando":
             if pressed:
                 if key == pygame.K_RIGHT:
-                    self.__player.mover_direita(True)
+                    self.player.mover_direita(True)
                 elif key == pygame.K_LEFT:
-                    self.__player.mover_esquerda(True)
+                    self.player.mover_esquerda(True)
                 elif key == pygame.K_UP:
-                    self.__player.pular()
+                    self.player.pular()
                 elif key == pygame.K_q:
-                    self.__player.ativar_furia(self)
+                    self.player.ativar_furia(self)
                 elif key == pygame.K_SPACE:
-                    self.__player.atacar()
+                    self.player.atacar()
                 elif key == pygame.K_ESCAPE:
-                    self.__estado = "menu"
-                    self.__menu.voltar_menu_principal()
+                    self.estado = "menu"
+                    self.menu.voltar_menu_principal()
                 elif key == pygame.K_p:
                     self.__toggle_pausar_musica()
                 elif key == pygame.K_PLUS or key == pygame.K_KP_PLUS:
@@ -463,9 +564,9 @@ class GameManager:
                     self.__ajustar_volume_musica(-0.1)
             else:
                 if key == pygame.K_RIGHT:
-                    self.__player.mover_direita(False)
+                    self.player.mover_direita(False)
                 elif key == pygame.K_LEFT:
-                    self.__player.mover_esquerda(False)
+                    self.player.mover_esquerda(False)
 
     def __toggle_pausar_musica(self):
         if pygame.mixer.music.get_busy():
@@ -483,31 +584,3 @@ class GameManager:
         novo_vol = max(0.0, min(1.0, vol + delta))
         pygame.mixer.music.set_volume(novo_vol)
         print(f"Volume da música: {int(novo_vol*100)}%")
-
-    @property
-    def estado(self):
-        return self.__estado
-
-    @estado.setter
-    def estado(self, value):
-        self.__estado = value
-
-    @property
-    def running(self):
-        return self.__running
-
-    @property
-    def menu(self):
-        return self.__menu
-
-    @property
-    def screen(self):
-        return self.__screen
-
-    @property
-    def display(self):
-        return self.__display
-
-    @property
-    def clock(self):
-        return self.__clock

@@ -5,14 +5,54 @@ from animation.animation import Animation
 
 class Particle:
     def __init__(self, p_type, pos, velocity=[0, 0], frame=0):
-        self.type = p_type
-        self.pos = list(pos)
-        self.velocity = list(velocity)
-        self.assets = {
+        self.__type = p_type
+        self.__pos = list(pos)
+        self.__velocity = list(velocity)
+        self.__assets = {
             'dash': Animation(load_images('particles/dash'), img_dur=6, loop=False)
         }
-        self.animation = self.assets[p_type].copy()
-        self.animation.frame = frame
+        self.__animation = self.assets[p_type].copy()
+        self.__animation.frame = frame
+        
+    @property
+    def type(self):
+        return self.__type
+
+    @type.setter
+    def type(self, value):
+        self.__type = value
+
+    @property
+    def pos(self):
+        return self.__pos
+
+    @pos.setter
+    def pos(self, value):
+        self.__pos = value
+
+    @property
+    def velocity(self):
+        return self.__velocity
+
+    @velocity.setter
+    def velocity(self, value):
+        self.__velocity = value
+
+    @property
+    def assets(self):
+        return self.__assets
+
+    @assets.setter
+    def assets(self, value):
+        self.__assets = value
+
+    @property
+    def animation(self):
+        return self.__animation
+
+    @animation.setter
+    def animation(self, value):
+        self.__animation = value
     
     def update(self):
         kill = False

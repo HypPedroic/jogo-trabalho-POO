@@ -31,7 +31,6 @@ class Esqueleto(Entidade):
         self.__player = None
         self.__game = game
         self.__espera_ataque = 0
-        self.__ja_viu_player = False  # Flag para não voltar a dormir após ver o player
         
     @property
     def vida(self):
@@ -120,14 +119,6 @@ class Esqueleto(Entidade):
     @espera_ataque.setter
     def espera_ataque(self, valor):
         self.__espera_ataque = valor
-        
-    @property
-    def ja_viu_player(self):
-        return self.__ja_viu_player
-    
-    @ja_viu_player.setter
-    def ja_viu_player(self, valor):
-        self.__ja_viu_player = valor
 
     def criar_projetil(self):
         if self.flip:
@@ -150,12 +141,10 @@ class Esqueleto(Entidade):
         self.game.tocar_som('tiro')
 
     def receber_dano(self, dano):
-        # Permite receber dano mesmo quando inativo (dormindo) se for atacado pelo player
         if self.iframes <= 0 and self.estado != 'morto':
             self.vida -= dano
             self.iframes = 60
             
-            # Se estava inativo e recebeu dano, acorda imediatamente
             if self.estado == 'inativo':
                 self.estado = 'acordando'
                 self.animDur = 28
@@ -171,7 +160,7 @@ class Esqueleto(Entidade):
     
     def __detectar_jogador(self):
         """Verifica se o jogador está no alcance de detecção"""
-        if not self.player or self.__estado == 'morto':
+        if not self.player or self.estado == 'morto':
             return False
         
         distancia = math.sqrt(
@@ -179,13 +168,13 @@ class Esqueleto(Entidade):
             (self.player.pos[1] - self.pos[1]) ** 2
         )
         
-        return distancia <= self.__alcance_deteccao
+        return distancia <= self.alcance_deteccao
     
     def atacar_jogador(self, game=None):
         """Ataca o jogador se estiver no alcance"""
         if self.pode_atacar_jogador_colisao():
             print("ATACAR")
-            self.__estado = 'atacando'
+            self.estado = 'atacando'
             self.animDur = 14
             
             # Toca som de ataque
@@ -193,19 +182,14 @@ class Esqueleto(Entidade):
                 game.tocar_som('ataque')
             
             # Aplica dano ao jogador
-            if hasattr(self.__player, 'receber_dano'):
+            if hasattr(self.player, 'receber_dano'):
                 if game:
                     self.player.receber_dano(1, game)
                 else:
                     self.player.receber_dano(1)
     
     def pode_atacar_jogador_colisao(self):
-        """Verifica se o esqueleto pode atacar o jogador"""
-        # Permite ataque mesmo quando inativo (dormindo) se o player estiver no modo fúria
-        if self.__player and self.__player.estado == 'foice':
-            return self.__estado != 'morto' and self.__iframes == 0
-        else:
-            return self.__estado != 'morto' and self.__iframes == 0 and self.estado != 'inativo'
+        return self.estado != 'morto' and self.iframes == 0 and self.estado != 'inativo'
     
     
     def direcao_jogador(self):
@@ -238,12 +222,11 @@ class Esqueleto(Entidade):
     
     def reset(self):
         """Reseta o esqueleto para estado inicial para reuso na pool"""
-        self.vida = self.__vida_maxima
+        self.vida = self.vida_maxima
         self.estado = self.estado
         self.animDur = 0
         self.iframes = 0
         self.espera_ataque = 0
-        self.__ja_viu_player = False
 
     def update(self, tilemap, player):
         self.player = player
@@ -261,24 +244,17 @@ class Esqueleto(Entidade):
         elif self.direcao_jogador() == 'direita':
             self.flip = False
         
-        # Detecta o jogador tanto no modo normal quanto no modo fúria
         if self.__detectar_jogador():
-            # Marca que já viu o player
-            self.__ja_viu_player = True
-            
             if self.estado == 'inativo':
                 self.estado = 'acordando'
                 self.animDur = 28
                 self.cont = 60
             elif self.estado == 'ativo':
                 self.cont = 60
-                # Só ataca com projétil se o player não estiver no modo fúria
-                if self.player.estado != 'foice':
-                    self.atacar_com_projetil()
+                self.atacar_com_projetil()
         elif self.estado == 'ativo' and self.cont > 0:
             self.cont -= 1
-            # Só volta a dormir se nunca viu o player
-            if self.cont <= 0 and not self.__ja_viu_player:
+            if self.cont <= 0:
                 self.estado = 'dormindo'
                 self.animDur = 28
 
@@ -314,5 +290,5 @@ class Esqueleto(Entidade):
     
     def renderizar(self, surf, offset=...):
         if self.iframes > 0 and (self.iframes // 3) % 2 == 0:
-            return  # Não desenha neste frame (efeito de piscar)
+            return
         super().renderizar(surf, offset)

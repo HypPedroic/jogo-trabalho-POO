@@ -85,27 +85,36 @@ class TileMap:
     @limite_mapa_y.setter
     def limite_mapa_y(self, value):
         self.__limite_mapa_y = value
+        
+    @property
+    def assets(self):
+        return self.__assets
+
+    @assets.setter
+    def assets(self, value):
+        self.__assets = value
+        
 
     # Método para pegar os tiles ao redor de uma posição
     def tiles_around(self, pos):
         tiles = []
-        tile_loc = (int(pos[0] // self.__tile_size), int(pos[1] // self.__tile_size))
-        for offset in self.__NEIGHBOR_OFFSET:
+        tile_loc = (int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))
+        for offset in self.NEIGHBOR_OFFSET:
             check_lock = str(tile_loc[0] + offset[0]) + ';' + str(tile_loc[1] + offset[1])
-            if check_lock in self.__tilemap:
-                tiles.append(self.__tilemap[check_lock])
+            if check_lock in self.tilemap:
+                tiles.append(self.tilemap[check_lock])
         return tiles
     
     def save(self, path):
         with open(path, 'w') as f:
-            json.dump({'tilemap': self.__tilemap, 'tile_size': self.__tile_size, 'offgrid': self.__offgrid_tiles}, f)
+            json.dump({'tilemap': self.tilemap, 'tile_size': self.tile_size, 'offgrid': self.offgrid_tiles}, f)
 
     def load(self, path):
         with open(path, 'r') as f:
             data = json.load(f)
-            self.__tilemap = data['tilemap']
-            self.__tile_size = data['tile_size']
-            self.__offgrid_tiles = data['offgrid']
+            self.tilemap = data['tilemap']
+            self.tile_size = data['tile_size']
+            self.offgrid_tiles = data['offgrid']
             
         self.__calcular_limite_mapa()
 
@@ -113,24 +122,24 @@ class TileMap:
     def fisica_rect_around(self, pos):
         rects = []
         for tile in self.tiles_around(pos):
-            if tile['type'] in self.__FISICA_ATIVADA:
-                rects.append(pygame.Rect(tile['pos'][0] * self.__tile_size, tile['pos'][1] * self.__tile_size, self.__tile_size, self.__tile_size))
+            if tile['type'] in self.FISICA_ATIVADA:
+                rects.append(pygame.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
         return rects
 
     # Definindo o método de renderização
     def renderizar(self, surf, offset=(0, 0)):
-        for tile in self.__offgrid_tiles:
-            surf.blit(self.__assets[tile['type']][tile['variant']], 
+        for tile in self.offgrid_tiles:
+            surf.blit(self.assets[tile['type']][tile['variant']], 
                      (tile['pos'][0] - offset[0], tile['pos'][1] - offset[1]))
 
-        for x in range(offset[0] // self.__tile_size, (offset[0] + surf.get_width()) // self.__tile_size + 1):
-            for y in range(offset[1] // self.__tile_size, (offset[1] + surf.get_height()) // self.__tile_size + 1):
+        for x in range(offset[0] // self.tile_size, (offset[0] + surf.get_width()) // self.tile_size + 1):
+            for y in range(offset[1] // self.tile_size, (offset[1] + surf.get_height()) // self.tile_size + 1):
                 loc = str(x) + ';' + str(y)
-                if loc in self.__tilemap:
-                    tile = self.__tilemap[loc]
-                    surf.blit(self.__assets[tile['type']][tile['variant']], 
-                             (tile['pos'][0] * self.__tile_size - offset[0], 
-                              tile['pos'][1] * self.__tile_size - offset[1]))
+                if loc in self.tilemap:
+                    tile = self.tilemap[loc]
+                    surf.blit(self.assets[tile['type']][tile['variant']], 
+                             (tile['pos'][0] * self.tile_size - offset[0], 
+                              tile['pos'][1] * self.tile_size - offset[1]))
 
 
     def procurar_objeto(self, id_pairs, keep=False):

@@ -105,6 +105,14 @@ class Player(Entidade):
     @dashing.setter
     def dashing(self, valor):
         self.__dashing = valor
+        
+    @property
+    def anim_offeset(self):
+        return self._Entidade__anim_offeset
+
+    @anim_offeset.setter
+    def anim_offeset(self, valor):
+        self._Entidade__anim_offeset = valor
     
     def update(self, tilemap, game):
         super().update(tilemap)
@@ -112,10 +120,10 @@ class Player(Entidade):
         self.verificar_limbo(tilemap)
         
         if self.atacando > 0:
-            self.__atacando -= 1
-            if self.__atacando == 56:
+            self.atacando -= 1
+            if self.atacando == 56:
                 self.__ataque_normal(game)
-            if self.__atacando <= 0:
+            if self.atacando <= 0:
                 self.atacando = 0
         
         if self.estado == 'foice':
@@ -127,7 +135,7 @@ class Player(Entidade):
         
         # Atualiza iframes
         if self.iframe_timer > 0:
-            self.__iframe_timer -= 1
+            self.iframe_timer -= 1
             
         if abs(self.dashing) in {60, 50}:
             for i in range(20):
@@ -155,20 +163,20 @@ class Player(Entidade):
 
     def fisica_colisao_Y(self, tilemap):
         super().fisica_colisao_Y(tilemap)
-        self.__air_time += 1
+        self.air_time += 1
         if self.colisoes['baixo']:
-            self.__air_time = 0
-            self.__pulos_disponiveis = 2
+            self.air_time = 0
+            self.pulos_disponiveis = 2
 
     def pular(self):
-        if self.__pulos_disponiveis > 1:
+        if self.pulos_disponiveis > 1:
             self.velocidade[1] = -6
-            self.__pulos_disponiveis -= 1
-            self.__air_time = 5
-        elif self.__pulos_disponiveis == 1:
+            self.pulos_disponiveis -= 1
+            self.air_time = 5
+        elif self.pulos_disponiveis == 1:
             self.velocidade[1] = -6
-            self.__pulos_disponiveis -= 1
-            self.__air_time = 5
+            self.pulos_disponiveis -= 1
+            self.air_time = 5
 
     def ativar_furia(self, game=None):
         if self.furia == 100:
@@ -258,23 +266,23 @@ class Player(Entidade):
         return False
 
     def __animacao_atual(self, game):
-        if self.__atacando > 0:
-            if self.__atacando > 32:
+        if self.atacando > 0:
+            if self.atacando > 32:
                 self.set_action('attack')
-        elif self.__air_time > 4:
-            if self.__estado == 'normal':
+        elif self.air_time > 4:
+            if self.estado == 'normal':
                 self.set_action('jump')
-            elif self.__estado == 'foice':
+            elif self.estado == 'foice':
                 self.set_action('jumpFoice')
         elif self.movimento[0] or self.movimento[1]:  # Se está se movendo para qualquer direção
-            if self.__estado == 'normal':
+            if self.estado == 'normal':
                 self.set_action('run')
-            elif self.__estado == 'foice':
+            elif self.estado == 'foice':
                 self.set_action('runFoice')
         else:
-            if self.__estado == 'normal':
+            if self.estado == 'normal':
                 self.set_action('idle')
-            elif self.__estado == 'foice':
+            elif self.estado == 'foice':
                 self.set_action('idleFoice')
                 
     def verificar_limbo(self, tilemap):

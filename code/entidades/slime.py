@@ -88,45 +88,181 @@ class Slime(Entidade):
     @game.setter
     def game(self, valor):
         self.__game = valor
+        
+    @property
+    def vida_maxima(self):
+        return self.__vida_maxima
+
+    @vida_maxima.setter
+    def vida_maxima(self, valor):
+        self.__vida_maxima = valor
+
+    @property
+    def direcao(self):
+        return self.__direcao
+
+    @direcao.setter
+    def direcao(self, valor):
+        self.__direcao = valor
+
+    @property
+    def velocidade_patrulha(self):
+        return self.__velocidade_patrulha
+
+    @velocidade_patrulha.setter
+    def velocidade_patrulha(self, valor):
+        self.__velocidade_patrulha = valor
+
+    @property
+    def velocidade_perseguicao(self):
+        return self.__velocidade_perseguicao
+
+    @velocidade_perseguicao.setter
+    def velocidade_perseguicao(self, valor):
+        self.__velocidade_perseguicao = valor
+
+    @property
+    def alcance_deteccao(self):
+        return self.__alcance_deteccao
+
+    @alcance_deteccao.setter
+    def alcance_deteccao(self, valor):
+        self.__alcance_deteccao = valor
+
+    @property
+    def alcance_ataque(self):
+        return self.__alcance_ataque
+
+    @alcance_ataque.setter
+    def alcance_ataque(self, valor):
+        self.__alcance_ataque = valor
+
+    @property
+    def tempo_ataque(self):
+        return self.__tempo_ataque
+
+    @tempo_ataque.setter
+    def tempo_ataque(self, valor):
+        self.__tempo_ataque = valor
+
+    @property
+    def intervalo_ataque(self):
+        return self.__intervalo_ataque
+
+    @intervalo_ataque.setter
+    def intervalo_ataque(self, valor):
+        self.__intervalo_ataque = valor
+
+    @property
+    def tempo_patrulha(self):
+        return self.__tempo_patrulha
+
+    @tempo_patrulha.setter
+    def tempo_patrulha(self, valor):
+        self.__tempo_patrulha = valor
+
+    @property
+    def intervalo_mudanca_direcao(self):
+        return self.__intervalo_mudanca_direcao
+
+    @intervalo_mudanca_direcao.setter
+    def intervalo_mudanca_direcao(self, valor):
+        self.__intervalo_mudanca_direcao = valor
+
+    @property
+    def distancia_deteccao_borda(self):
+        return self.__distancia_deteccao_borda
+
+    @distancia_deteccao_borda.setter
+    def distancia_deteccao_borda(self, valor):
+        self.__distancia_deteccao_borda = valor
+
+    @property
+    def iframes(self):
+        return self.__iframes
+
+    @iframes.setter
+    def iframes(self, valor):
+        self.__iframes = valor
+
+    @property
+    def duracao_iframes(self):
+        return self.__duracao_iframes
+
+    @duracao_iframes.setter
+    def duracao_iframes(self, valor):
+        self.__duracao_iframes = valor
+
+    @property
+    def tempo_animacao_morte(self):
+        return self.__tempo_animacao_morte
+
+    @tempo_animacao_morte.setter
+    def tempo_animacao_morte(self, valor):
+        self.__tempo_animacao_morte = valor
+
+    @property
+    def duracao_animacao_morte(self):
+        return self.__duracao_animacao_morte
+
+    @duracao_animacao_morte.setter
+    def duracao_animacao_morte(self, valor):
+        self.__duracao_animacao_morte = valor
+
+    @property
+    def tilemap(self):
+        return self.__tilemap
+
+    @tilemap.setter
+    def tilemap(self, valor):
+        self.__tilemap = valor
+
+    @property
+    def player(self):
+        return self.__player
+
+    @player.setter
+    def player(self, valor):
+        self.__player = valor
     
     def pode_atacar_jogador_colisao(self):
         """Verifica se o slime pode atacar o jogador"""
-        return self.__estado != 'morto' and self.__iframes == 0
+        return self.estado != 'morto' and self.iframes == 0
     
     def atacar_jogador_colisao(self, game=None):
         """Ataca o jogador causando dano"""
         if self.pode_atacar_jogador_colisao():
-            self.__player.receber_dano(self.__dano)
-            self.__iframes = self.__duracao_iframes
+            self.player.receber_dano(self.dano)
+            self.iframes = self.duracao_iframes
             if game:
                 game.tocar_som('dano')
         
     @property
     def animacao_morte_completa(self):
         """Verifica se a animação de morte foi completada"""
-        return self.__estado == 'morto' and self.__tempo_animacao_morte >= self.__duracao_animacao_morte
+        return self.estado == 'morto' and self.tempo_animacao_morte >= self.duracao_animacao_morte
     
     def reset(self):
         """Reseta o slime para estado inicial para reuso na pool"""
-        self.__vida = self.__vida_maxima
-        self.__estado = 'patrulhando'
-        self.__direcao = random.choice([-1, 1])
-        self.__tempo_ataque = 0
-        self.__tempo_patrulha = 0
-        self.__iframes = 0
-        self.__tempo_animacao_morte = 0
+        self.vida = self.vida_maxima
+        self.estado = 'patrulhando'
+        self.direcao = random.choice([-1, 1])
+        self.tempo_ataque = 0
+        self.tempo_patrulha = 0
+        self.iframes = 0
+        self.tempo_animacao_morte = 0
         
     
     def receber_dano(self, dano):
         """Aplica dano ao slime"""
-        if self.__iframes <= 0 and self.__estado != 'morto':
+        if self.iframes <= 0 and self.estado != 'morto':
             self.vida -= dano
-            self.__iframes = self.__duracao_iframes
+            self.iframes = self.duracao_iframes
             
             # Verifica se morreu
             if self.vida <= 0:
-                self.__estado = 'morto'
-                self.__tempo_animacao_morte = 0
+                self.estado = 'morto'
+                self.tempo_animacao_morte = 0
                 self.set_action('morrer')
                 
             return True
@@ -134,46 +270,46 @@ class Slime(Entidade):
     
     def __detectar_jogador(self):
         """Verifica se o jogador está no alcance de detecção"""
-        if not self.__player or self.__estado == 'morto':
+        if not self.player or self.estado == 'morto':
             return False
         
         distancia = math.sqrt(
-            (self.__player.pos[0] - self.pos[0]) ** 2 + 
-            (self.__player.pos[1] - self.pos[1]) ** 2
+            (self.player.pos[0] - self.pos[0]) ** 2 + 
+            (self.player.pos[1] - self.pos[1]) ** 2
         )
         
-        return distancia <= self.__alcance_deteccao
+        return distancia <= self.alcance_deteccao
     
     def __pode_atacar_jogador(self):
         """Verifica se pode atacar o jogador"""
-        if not self.__player or self.__estado == 'morto':
+        if not self.player or self.estado == 'morto':
             return False
         
         distancia = math.sqrt(
-            (self.__player.pos[0] - self.pos[0]) ** 2 + 
-            (self.__player.pos[1] - self.pos[1]) ** 2
+            (self.player.pos[0] - self.pos[0]) ** 2 + 
+            (self.player.pos[1] - self.pos[1]) ** 2
         )
         
-        return distancia <= self.__alcance_ataque and self.__tempo_ataque <= 0
+        return distancia <= self.alcance_ataque and self.tempo_ataque <= 0
     
     def __detectar_borda(self):
         """Detecta se há uma borda à frente"""
-        if not self.__tilemap:
+        if not self.tilemap:
             return False
         
         # Posição à frente do slime
-        pos_frente_x = self.pos[0] + (self.__direcao * self.__distancia_deteccao_borda)
+        pos_frente_x = self.pos[0] + (self.direcao * self.distancia_deteccao_borda)
         pos_frente_y = self.pos[1] + self.tamanho[1]  # Abaixo do slime
         
         # Verifica se há chão à frente
-        tiles_frente = self.__tilemap.tiles_around((pos_frente_x, pos_frente_y))
+        tiles_frente = self.tilemap.tiles_around((pos_frente_x, pos_frente_y))
         
         # Se não há tiles sólidos abaixo, é uma borda
         for tile in tiles_frente:
-            if tile['type'] in self.__tilemap.FISICA_ATIVADA:
+            if tile['type'] in self.tilemap.FISICA_ATIVADA:
                 tile_rect = pygame.Rect(
                     tile['pos'][0], tile['pos'][1],
-                    self.__tilemap.tile_size, self.__tilemap.tile_size
+                    self.tilemap.tile_size, self.tilemap.tile_size
                 )
                 if tile_rect.collidepoint(pos_frente_x, pos_frente_y):
                     return False
@@ -182,67 +318,67 @@ class Slime(Entidade):
     
     def __mover_para_jogador(self):
         """Move o slime em direção ao jogador"""
-        if not self.__player:
+        if not self.player:
             return
         
         # Calcula direção para o jogador
-        if self.__player.pos[0] > self.pos[0]:
-            self.__direcao = 1
+        if self.player.pos[0] > self.pos[0]:
+            self.direcao = 1
             self.flip = True
         else:
-            self.__direcao = -1
+            self.direcao = -1
             self.flip = False
         
         # Move na direção do jogador e muda a animação para ataque
-        self.velocidade[0] = self.__direcao * self.__velocidade_perseguicao
+        self.velocidade[0] = self.direcao * self.velocidade_perseguicao
         self.set_action('ataque')
     
     def __patrulhar(self):
         """Movimento de patrulha"""
         # Verifica se deve mudar de direção
-        if self.__tempo_patrulha <= 0 or self.__detectar_borda():
-            self.__direcao *= -1
-            self.__tempo_patrulha = self.__intervalo_mudanca_direcao
-            self.flip = self.__direcao > 0
+        if self.tempo_patrulha <= 0 or self.__detectar_borda():
+            self.direcao *= -1
+            self.tempo_patrulha = self.intervalo_mudanca_direcao
+            self.flip = self.direcao > 0
         
         # Move na direção atual e atualiza animação
-        self.velocidade[0] = self.__direcao * self.__velocidade_patrulha
-        self.__tempo_patrulha -= 1
+        self.velocidade[0] = self.direcao * self.velocidade_patrulha
+        self.tempo_patrulha -= 1
     
     def atacar_jogador(self, game=None):
         """Ataca o jogador se estiver no alcance"""
         if self.__pode_atacar_jogador():
-            self.__estado = 'atacando'
-            self.__tempo_ataque = self.__intervalo_ataque
+            self.estado = 'atacando'
+            self.tempo_ataque = self.intervalo_ataque
             
             # Toca som de ataque
             if game:
                 game.tocar_som('ataque')
             
             # Aplica dano ao jogador
-            if hasattr(self.__player, 'receber_dano'):
+            if hasattr(self.player, 'receber_dano'):
                 if game:
-                    self.__player.receber_dano(self.__dano, game)
+                    self.player.receber_dano(self.dano, game)
                 else:
-                    self.__player.receber_dano(self.__dano)
+                    self.player.receber_dano(self.dano)
     
     def update(self, tilemap, player):
         """Atualiza o slime"""
-        self.__tilemap = tilemap
-        self.__player = player
+        self.tilemap = tilemap
+        self.player = player
         
         # Atualiza iframes
-        if self.__iframes > 0:
-            self.__iframes -= 1
+        if self.iframes > 0:
+            self.iframes -= 1
         
         # Atualiza timer de ataque
-        if self.__tempo_ataque > 0:
-            self.__tempo_ataque -= 1
+        if self.tempo_ataque > 0:
+            self.tempo_ataque -= 1
         
         # Se está morto, apenas atualiza animação de morte
-        if self.__estado == 'morto':
-            self.__tempo_animacao_morte += 1
-            if self.__tempo_animacao_morte >= self.__duracao_animacao_morte:
+        if self.estado == 'morto':
+            self.tempo_animacao_morte += 1
+            if self.tempo_animacao_morte >= self.duracao_animacao_morte:
                 return False  # Indica que deve ser removido
             self.set_action('morrer')
             return True
@@ -250,14 +386,14 @@ class Slime(Entidade):
         # Lógica de IA baseada no estado
         if self.__detectar_jogador():
             if self.__pode_atacar_jogador():
-                self.__estado = 'atacando'
+                self.estado = 'atacando'
                 self.velocidade[0] = 0  # Para durante o ataque
                 self.set_action('ataque')
             else:
-                self.__estado = 'perseguindo'
+                self.estado = 'perseguindo'
                 self.__mover_para_jogador()
         else:
-            self.__estado = 'patrulhando'
+            self.estado = 'patrulhando'
             self.__patrulhar()
             self.set_action('andar')
         
@@ -267,8 +403,8 @@ class Slime(Entidade):
     
 
     def renderizar(self, surf, offset=...):
-        if self.__iframes > 0 and (self.__iframes // 3) % 2 == 0:
-            return  # Não desenha neste frame (efeito de piscar)
+        if self.iframes > 0 and (self.iframes // 3) % 2 == 0:
+            return 
         super().renderizar(surf, offset)
         
         

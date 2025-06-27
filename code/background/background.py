@@ -6,30 +6,46 @@ class Background:
         self.__screen_height = screen_height
         self.__layers = []
         
+    @property
+    def screen_height(self):
+        return self.__screen_height
+
+    @screen_height.setter
+    def screen_height(self, value):
+        self.__screen_height = value
+
+    @property
+    def layers(self):
+        return self.__layers
+
+    @layers.setter
+    def layers(self, value):
+        self.__layers = value
+        
     def add_layer(self, image_path, scroll_speed):
         """
         Adiciona uma nova camada ao background
         :param image_path: Caminho da imagem da camada
         :param scroll_speed: Velocidade de rolagem (1.0 = velocidade normal, 0.5 = metade da velocidade, etc)
         """
-        layer = BackgroundLayer(image_path, scroll_speed, self.__screen_height)
-        self.__layers.append(layer)
+        layer = BackgroundLayer(image_path, scroll_speed, self.screen_height)
+        self.layers.append(layer)
         
     def update(self, camera_pos):
         """Atualiza a posição de todas as camadas"""
-        for layer in self.__layers:
+        for layer in self.layers:
             layer.update(camera_pos)
     
     def render(self, surface):
         """Renderiza todas as camadas do background"""
-        for layer in self.__layers:
+        for layer in self.layers:
             layer.render(surface)
             
     def save(self, filepath):
         """Salva a configuração do background em um arquivo JSON"""
         data = {
-            'screen_height': self.__screen_height,
-            'layers': [layer.to_dict() for layer in self.__layers]
+            'screen_height': self.screen_height,
+            'layers': [layer.to_dict() for layer in self.layers]
         }
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=4)
@@ -48,6 +64,6 @@ class Background:
     
     def resize(self, new_height):
         """Redimensiona todas as camadas para uma nova altura"""
-        self.__screen_height = new_height
-        for layer in self.__layers:
+        self.screen_height = new_height
+        for layer in self.layers:
             layer.resize(new_height)

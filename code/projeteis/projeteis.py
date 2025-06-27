@@ -20,25 +20,12 @@ class Projetil:
         self.__set_action('projetil')
         self.__vidaMax = 1
         self.__vida = self.__vidaMax
-<<<<<<< HEAD
-        self.__tipo = tipo
-        
-        if self.__tipo == 'projetil':
-            self.__duracao = 120  # Projéteis do player duram mais
-        else:
-            self.__duracao = 60   # Projéteis dos inimigos mantêm duração original
-        
-        if self.__tipo == 'projetil':
-            self.__anim_offeset = (-32, -32)
-            self.__velocidade = 10
-=======
         self.__duracao = 60
         self.__tipo = tipo
         
         if self.__tipo == 'projetil':
             self.__anim_offeset = (-32, -32)
             self.__velocidade = 6
->>>>>>> main
         elif self.__tipo == 'osso':
             self.__anim_offeset = (0, 0)
             self.__velocidade = 4
@@ -131,23 +118,21 @@ class Projetil:
     @velocidade.setter
     def velocidade(self, value):
         self.__velocidade = value
-<<<<<<< HEAD
-        
-    @property
-    def duracao(self):
-        return self.__duracao
-    
-    @duracao.setter
-    def duracao(self, value):
-        self.__duracao = value
-=======
->>>>>>> main
     
     def mover_direita(self, estado=True):
         self.__movimento[0] = estado
 
     def mover_esquerda(self, estado=True):
-        self.__movimento[1] = estado
+        self.__movimento[1] = estado    
+    @property
+    def duracao(self):
+        return self.__duracao
+
+    @duracao.setter
+    def duracao(self, value):
+        self.__duracao = value
+        
+    
 
     # Definindo os métodos necessários para movimentação, física e renderização
     
@@ -156,53 +141,53 @@ class Projetil:
         # Cria uma caixa de colisão menor e centralizada
         offset_x = 0
         offset_y = 0
-        return pygame.Rect(self.__pos[0] + offset_x, self.__pos[1] + offset_y, 16, self.__tamanho[1])
+        return pygame.Rect(self.pos[0] + offset_x, self.pos[1] + offset_y, 16, self.tamanho[1])
 
     def __set_action(self, action):
-        if action != self.__action:
-            self.__action = action
-            self.__animation = self.__assets[action].copy()
+        if action != self.action:
+            self.action = action
+            self.animation = self.assets[action].copy()
 
     # Método que vai atuar na movimentação da entidade e na física   
     def update(self, game, tilemap):
         #Reseta as colisões
         
         # Decrementa a duração do projétil
-        self.__duracao -= 1
-        if self.__duracao <= 0:
-            self.__vida = 0  # Remove o projétil quando a duração acaba
+        self.duracao -= 1
+        if self.duracao <= 0:
+            self.vida = 0  # Remove o projétil quando a duração acaba
 
         self.__movimentar_X(game, tilemap)
 
-        self.__animation.update()
+        self.animation.update()
         
         self.__set_action(self.tipo)
 
     def __movimentar_X(self, game, tilemap):
-        movimento_x = self.__movimento[0] - self.__movimento[1]
+        movimento_x = self.movimento[0] - self.movimento[1]
 
-        self.__pos[0] += movimento_x * self.velocidade
+        self.pos[0] += movimento_x * self.velocidade
         # Verifica se a entidade está colidindo com algum retângulo de colisão para o eixo X
         self.__colisao_X(game, tilemap, movimento_x)
 
         if movimento_x > 0:
-            self.__flip = False
+            self.flip = False
         elif movimento_x < 0:
-            self.__flip = True
+            self.flip = True
 
     def __colisao_X(self, game, tilemap, movimento):
         retangulo_colisao = self.retangulo()
-        for rect in tilemap.fisica_rect_around(self.__pos):
+        for rect in tilemap.fisica_rect_around(self.pos):
             if retangulo_colisao.colliderect(rect):
                 if movimento > 0:
                     retangulo_colisao.right = rect.left
-                    self.__vida = 0
-                    self.__hit = True
+                    self.vida = 0
+                    self.hit = True
                 if movimento < 0:
                     retangulo_colisao.left = rect.right
-                    self.__hit = True
-                    self.__vida = 0
-                self.__pos[0] = retangulo_colisao.x
+                    self.hit = True
+                    self.vida = 0
+                self.pos[0] = retangulo_colisao.x
         
 
                 
@@ -211,5 +196,5 @@ class Projetil:
     # Método que vai renderizar a entidade na tela
     def renderizar(self, surf, offset=(0, 0)):
         # Renderiza a entidade na tela
-        surf.blit(pygame.transform.flip(self.__animation.img(), self.__flip, False), (self.__pos[0] - offset[0] + self.__anim_offeset[0], self.__pos[1] - offset[1] + self.__anim_offeset[1]))
+        surf.blit(pygame.transform.flip(self.animation.img(), self.flip, False), (self.pos[0] - offset[0] + self.anim_offeset[0], self.pos[1] - offset[1] + self.anim_offeset[1]))
         #surf.blit(self.game.assets['player'], (self.pos[0] - offset[0], self.pos[1] - offset[1]))

@@ -17,24 +17,40 @@ class Jogo:
         
         # Inicializa o gerenciador do jogo
         self.__game_manager = GameManager(self.__screen)
+        
+    @property
+    def screen(self):
+        return self.__screen
+
+    @screen.setter
+    def screen(self, value):
+        self.__screen = value
+
+    @property
+    def game_manager(self):
+        return self.__game_manager
+
+    @game_manager.setter
+    def game_manager(self, value):
+        self.__game_manager = value
 
     def run(self):
         """Loop principal do jogo"""
         try:
-            while self.__game_manager.running:
+            while self.game_manager.running:
                 # Processa eventos
-                self.__game_manager.processar_eventos()
+                self.game_manager.processar_eventos()
                 
                 # Atualiza o estado do jogo
-                if self.__game_manager.estado == "menu":
+                if self.game_manager.estado == "menu":
                     print("Executando menu...")
-                    self.__game_manager.menu.running = True
-                    nome = self.__game_manager.menu.run()
+                    self.game_manager.menu.running = True
+                    nome = self.game_manager.menu.run()
                     print(f"Menu retornou: {nome}")
                     
                     if nome == "continuar":
                         print("Carregando progresso salvo...")
-                        self.__game_manager.iniciar_jogo_carregado()
+                        self.game_manager.iniciar_jogo_carregado()
                     elif isinstance(nome, dict):  # Se retornou um dicionário, inicia o jogo normalmente
                         print(f"Iniciando jogo com jogador: {nome}")
                         try:
@@ -46,45 +62,45 @@ class Jogo:
                                     os.remove(save_path)
                         except Exception:
                             pass
-                        self.__game_manager.iniciar_jogo(nome)
-                    elif not self.__game_manager.menu.running:  # Se o menu foi fechado
+                        self.game_manager.iniciar_jogo(nome)
+                    elif not self.game_manager.menu.running:  # Se o menu foi fechado
                         print("Menu foi fechado, encerrando jogo")
                         break
                     else:
                         print("Menu continua rodando...")
                         
-                elif self.__game_manager.estado == "jogando":
-                    self.__game_manager.update()
+                elif self.game_manager.estado == "jogando":
+                    self.game_manager.update()
                     
-                elif self.__game_manager.estado == "game_over":
+                elif self.game_manager.estado == "game_over":
                     print("Executando menu de game over...")
-                    self.__game_manager.menu.running = True
-                    self.__game_manager.menu.run()
+                    self.game_manager.menu.running = True
+                    self.game_manager.menu.run()
                     
-                    if not self.__game_manager.menu.running:  # Se o menu foi fechado
+                    if not self.game_manager.menu.running:  # Se o menu foi fechado
                         print("Menu de game over foi fechado")
-                        if self.__game_manager.menu.estado == "menu_principal":
-                            self.__game_manager.estado = "menu"
+                        if self.game_manager.menu.estado == "menu_principal":
+                            self.game_manager.estado = "menu"
                             print("Voltando ao menu principal")
                         else:
                             break
                             
-                elif self.__game_manager.estado == "vitoria":
+                elif self.game_manager.estado == "vitoria":
                     print("Executando tela de vitória...")
-                    self.__game_manager.menu.running = True
-                    self.__game_manager.menu.run()
+                    self.game_manager.menu.running = True
+                    self.game_manager.menu.run()
                     
-                    if not self.__game_manager.menu.running:  # Se o menu foi fechado
+                    if not self.game_manager.menu.running:  # Se o menu foi fechado
                         print("Tela de vitória foi fechada")
-                        if self.__game_manager.menu.estado == "menu_principal":
-                            self.__game_manager.estado = "menu"
+                        if self.game_manager.menu.estado == "menu_principal":
+                            self.game_manager.estado = "menu"
                             print("Voltando ao menu principal")
                         else:
                             break
                 
                 # Atualiza a tela
                 pygame.display.flip()
-                self.__game_manager.clock.tick(60)
+                self.game_manager.clock.tick(60)
                 
         except Exception as e:
             print(f"Erro durante execução do jogo: {e}")
