@@ -20,12 +20,25 @@ class Projetil:
         self.__set_action('projetil')
         self.__vidaMax = 1
         self.__vida = self.__vidaMax
+<<<<<<< HEAD
+        self.__tipo = tipo
+        
+        if self.__tipo == 'projetil':
+            self.__duracao = 120  # Projéteis do player duram mais
+        else:
+            self.__duracao = 60   # Projéteis dos inimigos mantêm duração original
+        
+        if self.__tipo == 'projetil':
+            self.__anim_offeset = (-32, -32)
+            self.__velocidade = 10
+=======
         self.__duracao = 60
         self.__tipo = tipo
         
         if self.__tipo == 'projetil':
             self.__anim_offeset = (-32, -32)
             self.__velocidade = 6
+>>>>>>> main
         elif self.__tipo == 'osso':
             self.__anim_offeset = (0, 0)
             self.__velocidade = 4
@@ -118,6 +131,17 @@ class Projetil:
     @velocidade.setter
     def velocidade(self, value):
         self.__velocidade = value
+<<<<<<< HEAD
+        
+    @property
+    def duracao(self):
+        return self.__duracao
+    
+    @duracao.setter
+    def duracao(self, value):
+        self.__duracao = value
+=======
+>>>>>>> main
     
     def mover_direita(self, estado=True):
         self.__movimento[0] = estado
@@ -142,6 +166,11 @@ class Projetil:
     # Método que vai atuar na movimentação da entidade e na física   
     def update(self, game, tilemap):
         #Reseta as colisões
+        
+        # Decrementa a duração do projétil
+        self.__duracao -= 1
+        if self.__duracao <= 0:
+            self.__vida = 0  # Remove o projétil quando a duração acaba
 
         self.__movimentar_X(game, tilemap)
 

@@ -109,6 +109,13 @@ class GameManager:
     @display.setter
     def display(self, value):
         self.__display = value
+<<<<<<< HEAD
+    
+    @property
+    def spawn_manager(self):
+        return self.__spawn_manager
+=======
+>>>>>>> main
 
     def tocar_som(self, nome_som):
         if nome_som in self.__sons:
@@ -261,15 +268,21 @@ class GameManager:
     def __salvar_progresso(self):
         if not self.__player:
             return False
-        # Salvar inimigos vivos (posição)
+        # Salvar inimigos vivos (posição e estado)
         inimigos_vivos = []
         if self.__spawn_manager:
             for inimigo in self.__spawn_manager._SpawnManager__inimigos_ativos:
                 if hasattr(inimigo, 'pos') and getattr(inimigo, 'estado', None) != 'morto':
-                    inimigos_vivos.append({
+                    inimigo_data = {
                         'pos': list(inimigo.pos),
-                        'tipo': type(inimigo).__name__
-                    })
+                        'tipo': type(inimigo).__name__,
+                        'vida': getattr(inimigo, 'vida', 1),
+                        'estado': getattr(inimigo, 'estado', 'idle')
+                    }
+                    # Adicionar propriedades específicas dos esqueletos
+                    if type(inimigo).__name__ == 'Esqueleto':
+                        inimigo_data['vida_maxima'] = getattr(inimigo, 'vida_maxima', 2)
+                    inimigos_vivos.append(inimigo_data)
         progresso = {
             "nome": self.__nome_jogador,
             "dificuldade": self.__dificuldade,
@@ -341,6 +354,17 @@ class GameManager:
                 if inimigo_data['tipo'] == 'Slime':
                     from entidades.slime import Slime
                     inimigo = Slime(tuple(inimigo_data['pos']), (16, 16))
+                    # Restaurar propriedades do slime
+                    inimigo.vida = inimigo_data.get('vida', 1)
+                    inimigo.estado = inimigo_data.get('estado', 'idle')
+                    self.__spawn_manager._SpawnManager__inimigos_ativos.append(inimigo)
+                elif inimigo_data['tipo'] == 'Esqueleto':
+                    from entidades.esqueleto import Esqueleto
+                    inimigo = Esqueleto(tuple(inimigo_data['pos']), (32, 32), game=self)
+                    # Restaurar propriedades do esqueleto
+                    inimigo.vida = inimigo_data.get('vida', 2)
+                    inimigo.vida_maxima = inimigo_data.get('vida_maxima', 2)
+                    inimigo.estado = inimigo_data.get('estado', 'inativo')
                     self.__spawn_manager._SpawnManager__inimigos_ativos.append(inimigo)
             self.__spawn_manager._SpawnManager__inimigos_mortos = progresso.get("inimigos_mortos", 0)
             self.__spawn_manager._SpawnManager__max_inimigos = len(progresso.get("inimigos_ativos", []))

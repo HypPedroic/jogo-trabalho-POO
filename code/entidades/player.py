@@ -191,6 +191,36 @@ class Player(Entidade):
                     self.dashing = 60
 
     def __ataque_normal(self, game):
+        # Verifica se há inimigos na área de ataque corpo a corpo
+        area_ataque = 50  # Alcance do ataque corpo a corpo
+        
+        if hasattr(game, 'spawn_manager') and game.spawn_manager:
+            for inimigo in game.spawn_manager._SpawnManager__inimigos_ativos[:]:
+                if inimigo.estado != 'morto':
+                    # Calcula distância até o inimigo
+                    distancia = ((inimigo.pos[0] - self.pos[0]) ** 2 + (inimigo.pos[1] - self.pos[1]) ** 2) ** 0.5
+                    
+                    # Verifica se está na direção correta e no alcance
+                    if distancia <= area_ataque:
+                        # Verifica se o inimigo está na direção do ataque
+                        if (self.flip and inimigo.pos[0] < self.pos[0]) or (not self.flip and inimigo.pos[0] > self.pos[0]):
+                            # Aplica dano ao inimigo
+                            vida_antes = inimigo.vida
+                            inimigo.receber_dano(2)  # Ataque corpo a corpo causa mais dano
+                            
+                            # Aumenta fúria se matou o inimigo
+                            if vida_antes > 0 and inimigo.vida <= 0:
+                                if self.furia < 100:
+                                    self.furia += 50
+                                game.tocar_som('matando_inimigo')
+                            else:
+                                if self.furia < 100:
+                                    self.furia += 25
+                            
+                            # Só ataca um inimigo por vez
+                            return
+        
+        # Se não atingiu nenhum inimigo corpo a corpo, dispara projétil
         if self.flip:
             x = self.pos[0] - self.tamanho[0]
         else:
